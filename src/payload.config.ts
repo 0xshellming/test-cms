@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url'
 import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
 import { GetPlatformProxyOptions } from 'wrangler'
 import { r2Storage } from '@payloadcms/storage-r2'
+import { en } from '@payloadcms/translations/languages/en'
+import { zh } from '@payloadcms/translations/languages/zh'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -38,6 +40,10 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
+  i18n: {
+    fallbackLanguage: 'en',
+    supportedLanguages: { en, zh },
+  },
   plugins: [
     r2Storage({
       bucket: cloudflare.env.R2,
