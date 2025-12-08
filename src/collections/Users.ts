@@ -8,6 +8,21 @@ export const Users: CollectionConfig = {
   auth: true,
   fields: [
     // Email added by default
-    // Add more fields as needed
+    {
+      name: 'username',
+      type: 'text',
+      required: false,
+      admin: {
+        description: '用户名',
+      },
+    },
+    {
+      name: 'avatar',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: '用户头像',
+      },
+    },
   ],
 }

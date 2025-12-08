@@ -31,12 +31,18 @@ export default async function HomePage() {
         {user && <h1>Welcome back, {user.email}</h1>}
         <div className="links">
           <a
+            className="blog"
+            href="/blog"
+          >
+            查看博客
+          </a>
+          <a
             className="admin"
             href={payloadConfig.routes.admin}
             rel="noopener noreferrer"
             target="_blank"
           >
-            Go to admin panel
+            管理后台
           </a>
           <a
             className="docs"
@@ -44,7 +50,7 @@ export default async function HomePage() {
             rel="noopener noreferrer"
             target="_blank"
           >
-            Documentation
+            文档
           </a>
         </div>
       </div>

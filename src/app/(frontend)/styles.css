@@ -127,6 +127,12 @@ svg {
       border-radius: 4px;
     }
 
+    .blog {
+      color: rgb(0, 0, 0);
+      background: rgb(1000, 1000, 1000);
+      border: 1px solid rgb(0, 0, 0);
+    }
+
     .admin {
       color: rgb(0, 0, 0);
       background: rgb(1000, 1000, 1000);
