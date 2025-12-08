@@ -14,12 +14,14 @@ export const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'slug',
       type: 'text',
       required: true,
       unique: true,
+      localized: true,
       admin: {
         description: 'URL 友好的文章标识符（例如：my-blog-post）',
       },
@@ -55,6 +57,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'excerpt',
       type: 'textarea',
+      localized: true,
       admin: {
         description: '文章摘要，用于列表页显示',
       },
@@ -63,6 +66,7 @@ export const Posts: CollectionConfig = {
       name: 'content',
       type: 'richText',
       required: true,
+      localized: true,
     },
     {
       name: 'featuredImage',

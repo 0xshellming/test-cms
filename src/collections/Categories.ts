@@ -13,12 +13,14 @@ export const Categories: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'slug',
       type: 'text',
       required: true,
       unique: true,
+      localized: true,
       admin: {
         description: 'URL 友好的分类标识符',
       },
@@ -26,7 +28,7 @@ export const Categories: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
+      localized: true,
     },
   ],
 }
-

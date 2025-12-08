@@ -44,6 +44,20 @@ export default buildConfig({
     fallbackLanguage: 'en',
     supportedLanguages: { en, zh },
   },
+  localization: {
+    locales: [
+      {
+        label: 'English',
+        code: 'en',
+      },
+      {
+        label: '中文',
+        code: 'zh',
+      },
+    ],
+    defaultLocale: 'en',
+    fallback: true,
+  },
   plugins: [
     r2Storage({
       bucket: cloudflare.env.R2,
