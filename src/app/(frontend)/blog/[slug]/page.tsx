@@ -16,7 +16,7 @@ type Props = {
 
 export async function generateMetadata(props: Props) {
   const { slug } = await props.params
-  const headers = await getHeaders()
+  const _headers = await getHeaders()
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
@@ -57,7 +57,7 @@ export async function generateMetadata(props: Props) {
 
 export default async function BlogPostPage(props: Props) {
   const { slug } = await props.params
-  const headers = await getHeaders()
+  const _headers = await getHeaders()
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 

@@ -14,7 +14,7 @@ export const metadata = {
 }
 
 export default async function BlogPage() {
-  const headers = await getHeaders()
+  const _headers = await getHeaders()
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
