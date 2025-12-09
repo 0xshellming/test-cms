@@ -1,9 +1,11 @@
 // Service Worker 版本号 - 更新此值以强制更新缓存
-const CACHE_VERSION = 'v8'
+const CACHE_VERSION = 'v13'
 const CACHE_NAME = `pwa-cache-${CACHE_VERSION}`
 
-// 需要预缓存的资源列表（不包含根路径，避免缓存重定向）
-const PRECACHE_URLS = ['/', '/icon-192x192.png', '/icon-512x512.png']
+// 需要预缓存的资源列表
+// 注意：不预缓存根路径 '/'，因为它会重定向
+// 预缓存重定向后的实际页面（语言特定首页）
+const PRECACHE_URLS = ['/zh', '/en', '/icon-192x192.png', '/icon-512x512.png']
 
 // 安装事件 - 预缓存关键资源
 self.addEventListener('install', (event) => {
@@ -63,9 +65,17 @@ async function networkFirst(request) {
     if (cachedResponse) {
       return cachedResponse
     }
-    // 如果是导航请求且没有缓存，返回离线页面
+    // 如果是导航请求且没有缓存，尝试返回缓存的语言首页
     if (request.mode === 'navigate') {
-      return caches.match('/')
+      // 尝试返回用户偏好语言的首页（按优先级）
+      const fallbackPages = ['/zh', '/en']
+      for (const page of fallbackPages) {
+        const fallback = await caches.match(page)
+        if (fallback) {
+          console.log('[Service Worker] Using fallback page:', page)
+          return fallback
+        }
+      }
     }
     throw error
   }
@@ -127,6 +137,13 @@ async function staleWhileRevalidate(request) {
 function getStrategy(request) {
   const url = new URL(request.url)
 
+  // Next.js 图片优化 API 使用 Stale While Revalidate
+  // 立即返回缓存的优化图片，同时在后台更新
+  if (url.pathname.startsWith('/_next/image')) {
+    console.log('[Service Worker] Next.js image optimization:', url.pathname)
+    return staleWhileRevalidate(request)
+  }
+
   // 静态资源（图片、字体、CSS、JS）使用 Cache First
   if (url.pathname.match(/\.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|ttf|eot|css|js)$/)) {
     return cacheFirst(request)
@@ -166,10 +183,13 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // 对于根路径，让浏览器自然跟随重定向，不使用缓存策略
-  // 这样可以避免缓存重定向响应导致的 Safari 错误
+  // 特殊处理根路径：直接使用网络请求，不经过 Service Worker 缓存
+  // 原因：
+  // 1. 根路径会重定向到语言特定路径（如 /zh 或 /en）
+  // 2. Safari 在处理 Service Worker 缓存的重定向响应时有兼容性问题
+  // 3. 让浏览器原生处理重定向，重定向后的目标页面会正常缓存
   if (url.pathname === '/' || url.pathname === '') {
-    console.log('[Service Worker] Root path detected, bypassing cache for redirect')
+    console.log('[Service Worker] Root path - bypassing SW for Safari redirect compatibility')
     event.respondWith(fetch(request))
     return
   }
