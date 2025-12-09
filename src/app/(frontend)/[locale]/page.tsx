@@ -8,6 +8,14 @@ type Props = {
   params: Promise<{ locale: string }>
 }
 
+// 生成静态参数
+export async function generateStaticParams() {
+  return [{ locale: 'zh' }, { locale: 'en' }]
+}
+
+// 启用增量静态再生，每1小时重新生成
+export const revalidate = 3600
+
 export default async function HomePage(props: Props) {
   const { locale: localeParam } = await props.params
 
@@ -22,7 +30,7 @@ export default async function HomePage(props: Props) {
     <div className="blog-container">
       <header className="blog-header">
         <div className="blog-header-top">
-          <h1>{locale === 'zh' ? '欢迎' : 'Welcome'}</h1>
+          <h1>{t('home.welcome')}</h1>
           <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
             <LocaleSwitcher currentLocale={locale} />
           </Suspense>
@@ -30,11 +38,9 @@ export default async function HomePage(props: Props) {
       </header>
 
       <div style={{ padding: '40px 0' }}>
-        <h2>{locale === 'zh' ? 'Payload CMS 演示' : 'Payload CMS Demo'}</h2>
+        <h2>{t('home.title')}</h2>
         <p style={{ marginTop: '20px', fontSize: '18px', lineHeight: '1.6' }}>
-          {locale === 'zh'
-            ? '这是一个使用 Payload CMS 构建的多语言博客演示项目。'
-            : 'This is a multilingual blog demo project built with Payload CMS.'}
+          {t('home.description')}
         </p>
 
         <div style={{ marginTop: '40px' }}>
@@ -71,7 +77,7 @@ export default async function HomePage(props: Props) {
               transition: 'all 0.2s',
             }}
           >
-            {locale === 'zh' ? '管理后台' : 'Admin'} →
+            {t('home.admin')} →
           </Link>
         </div>
       </div>

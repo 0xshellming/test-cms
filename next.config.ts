@@ -25,7 +25,19 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/**',
       },
     ],
+    // 优化图片加载性能
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 3600, // 图片缓存1小时
   },
+  // 优化缓存策略
+  experimental: {
+    // 启用优化的包导入
+    optimizePackageImports: ['@payloadcms/richtext-lexical'],
+  },
+  // 压缩配置
+  compress: true,
+  // 生产环境优化
+  swcMinify: true,
   webpack: (webpackConfig: any) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

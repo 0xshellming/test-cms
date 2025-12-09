@@ -1,16 +1,15 @@
 import { headers as getHeaders } from 'next/headers.js'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getPayload } from 'payload'
 import React from 'react'
 
-import config from '@/payload.config'
 import './blog.css'
 import { Tag } from '@/payload-types'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
 import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
 import { getAbsoluteImageUrl, getBaseUrlFromHeaders } from '@/lib/image-url'
 import { notFound } from 'next/navigation'
+import { getCachedPosts } from '@/lib/cache'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -32,6 +31,9 @@ export async function generateStaticParams() {
   return [{ locale: 'zh' }, { locale: 'en' }]
 }
 
+// 启用增量静态再生，每1小时重新生成
+export const revalidate = 3600
+
 export default async function BlogPage(props: Props) {
   const { locale: localeParam } = await props.params
 
@@ -45,22 +47,9 @@ export default async function BlogPage(props: Props) {
 
   const _headers = await getHeaders()
   const baseUrl = getBaseUrlFromHeaders(_headers)
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
 
-  const posts = await payload.find({
-    collection: 'posts',
-    where: {
-      _status: {
-        equals: 'published',
-      },
-    },
-    sort: '-publishedDate',
-    limit: 20,
-    depth: 2,
-    draft: false,
-    locale: locale,
-  })
+  // 使用缓存的查询结果
+  const posts = await getCachedPosts(locale, 20)
 
   return (
     <div className="blog-container">

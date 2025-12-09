@@ -12,6 +12,9 @@ export async function generateStaticParams() {
   return [{ locale: 'zh' }, { locale: 'en' }]
 }
 
+// 启用增量静态再生，每1小时重新生成
+export const revalidate = 3600
+
 export default async function LocaleLayout(props: Props) {
   const { children, params } = props
   const { locale: localeParam } = await params

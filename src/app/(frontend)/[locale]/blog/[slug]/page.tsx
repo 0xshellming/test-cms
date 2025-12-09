@@ -2,14 +2,13 @@ import { headers as getHeaders } from 'next/headers.js'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getPayload } from 'payload'
 import React from 'react'
 import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
 
-import config from '@/payload.config'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
 import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
 import { getAbsoluteImageUrl, getBaseUrlFromHeaders } from '@/lib/image-url'
+import { getCachedPost, getCachedPostSlugs } from '@/lib/cache'
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>
@@ -25,45 +24,41 @@ export async function generateMetadata(props: Props) {
   const locale = localeParam as Locale
   const t = createTranslator(locale)
 
-  const _headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
+  const post = await getCachedPost(slug, locale)
 
-  const posts = await payload.find({
-    collection: 'posts',
-    where: {
-      and: [
-        {
-          slug: {
-            equals: slug,
-          },
-        },
-        {
-          _status: {
-            equals: 'published',
-          },
-        },
-      ],
-    },
-    limit: 1,
-    depth: 2,
-    draft: false,
-    locale: locale,
-  })
-
-  if (posts.docs.length === 0) {
+  if (!post) {
     return {
       title: t('blog.postNotFound'),
     }
   }
-
-  const post = posts.docs[0]
 
   return {
     title: post.title || t('blog.blogPost'),
     description: post.excerpt || undefined,
   }
 }
+
+// 生成所有博客文章的静态参数
+export async function generateStaticParams() {
+  const locales: Locale[] = ['zh', 'en']
+  const params: Array<{ locale: string; slug: string }> = []
+
+  for (const locale of locales) {
+    try {
+      const slugs = await getCachedPostSlugs(locale)
+      for (const slug of slugs) {
+        params.push({ locale, slug })
+      }
+    } catch (error) {
+      console.error(`Failed to generate static params for locale ${locale}:`, error)
+    }
+  }
+
+  return params
+}
+
+// 启用增量静态再生，每1小时重新生成
+export const revalidate = 3600
 
 export default async function BlogPostPage(props: Props) {
   const { locale: localeParam, slug } = await props.params
@@ -78,36 +73,13 @@ export default async function BlogPostPage(props: Props) {
 
   const _headers = await getHeaders()
   const baseUrl = getBaseUrlFromHeaders(_headers)
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
 
-  const posts = await payload.find({
-    collection: 'posts',
-    where: {
-      and: [
-        {
-          slug: {
-            equals: slug,
-          },
-        },
-        {
-          _status: {
-            equals: 'published',
-          },
-        },
-      ],
-    },
-    limit: 1,
-    depth: 2,
-    draft: false,
-    locale: locale,
-  })
+  // 使用缓存的查询结果
+  const post = await getCachedPost(slug, locale)
 
-  if (posts.docs.length === 0) {
+  if (!post) {
     notFound()
   }
-
-  const post = posts.docs[0]
   const featuredImage =
     typeof post.featuredImage === 'object' && post.featuredImage ? post.featuredImage : null
 

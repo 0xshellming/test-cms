@@ -3,6 +3,12 @@
 
 export const translations = {
   zh: {
+    home: {
+      welcome: '欢迎',
+      title: 'Payload CMS 演示',
+      description: '这是一个使用 Payload CMS 构建的多语言博客演示项目。',
+      admin: '管理后台',
+    },
     blog: {
       title: '博客',
       backToHome: '返回首页',
@@ -22,6 +28,12 @@ export const translations = {
     },
   },
   en: {
+    home: {
+      welcome: 'Welcome',
+      title: 'Payload CMS Demo',
+      description: 'This is a multilingual blog demo project built with Payload CMS.',
+      admin: 'Admin',
+    },
     blog: {
       title: 'Blog',
       backToHome: 'Back to Home',
