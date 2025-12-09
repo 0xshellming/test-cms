@@ -1,9 +1,9 @@
 // Service Worker 版本号 - 更新此值以强制更新缓存
-const CACHE_VERSION = 'v7'
+const CACHE_VERSION = 'v8'
 const CACHE_NAME = `pwa-cache-${CACHE_VERSION}`
 
-// 需要预缓存的资源列表
-const PRECACHE_URLS = ['/', '/icon-192x192.png', '/icon-512x512.png']
+// 需要预缓存的资源列表（不包含根路径，避免缓存重定向）
+const PRECACHE_URLS = ['/icon-192x192.png', '/icon-512x512.png']
 
 // 安装事件 - 预缓存关键资源
 self.addEventListener('install', (event) => {
@@ -43,6 +43,14 @@ self.addEventListener('activate', (event) => {
 async function networkFirst(request) {
   try {
     const networkResponse = await fetch(request)
+
+    // 检查是否是重定向响应（3xx 状态码）
+    if (networkResponse.type === 'opaqueredirect' || networkResponse.status >= 300) {
+      // 不缓存重定向响应，直接返回（浏览器会自动跟随重定向）
+      console.log('[Service Worker] Redirect detected, not caching:', request.url)
+      return networkResponse
+    }
+
     // 如果网络请求成功，更新缓存
     if (networkResponse.ok) {
       const cache = await caches.open(CACHE_NAME)
@@ -71,6 +79,14 @@ async function cacheFirst(request) {
   }
   try {
     const networkResponse = await fetch(request)
+
+    // 检查是否是重定向响应（3xx 状态码）
+    if (networkResponse.type === 'opaqueredirect' || networkResponse.status >= 300) {
+      // 不缓存重定向响应，直接返回
+      console.log('[Service Worker] Redirect detected, not caching:', request.url)
+      return networkResponse
+    }
+
     if (networkResponse.ok) {
       const cache = await caches.open(CACHE_NAME)
       cache.put(request, networkResponse.clone())
@@ -88,6 +104,16 @@ async function staleWhileRevalidate(request) {
   const cachedResponse = await caches.match(request)
 
   const fetchPromise = fetch(request).then((networkResponse) => {
+    // 检查是否是重定向响应（3xx 状态码）
+    if (
+      networkResponse.type === 'opaqueredirect' ||
+      (networkResponse.status >= 300 && networkResponse.status < 400)
+    ) {
+      // 不缓存重定向响应
+      console.log('[Service Worker] Redirect detected, not caching:', request.url)
+      return networkResponse
+    }
+
     if (networkResponse.ok) {
       cache.put(request, networkResponse.clone())
     }
@@ -137,6 +163,14 @@ self.addEventListener('fetch', (event) => {
 
   // 跳过 Payload Admin 相关请求（避免缓存管理后台）
   if (url.pathname.startsWith('/admin')) {
+    return
+  }
+
+  // 对于根路径，让浏览器自然跟随重定向，不使用缓存策略
+  // 这样可以避免缓存重定向响应导致的 Safari 错误
+  if (url.pathname === '/' || url.pathname === '') {
+    console.log('[Service Worker] Root path detected, bypassing cache for redirect')
+    event.respondWith(fetch(request))
     return
   }
 
