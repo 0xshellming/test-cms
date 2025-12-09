@@ -1,4 +1,3 @@
-import { headers as getHeaders } from 'next/headers.js'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -7,7 +6,7 @@ import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
 
 import LocaleSwitcher from '@/components/LocaleSwitcher'
 import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
-import { getAbsoluteImageUrl, getBaseUrlFromHeaders } from '@/lib/image-url'
+import { getAbsoluteImageUrl } from '@/lib/image-url'
 import { getCachedPost, getCachedPostSlugs } from '@/lib/cache'
 
 type Props = {
@@ -85,15 +84,9 @@ export default async function BlogPostPage(props: Props) {
   const locale = localeParam as Locale
   const t = createTranslator(locale)
 
-  // 安全地获取 headers 和 baseUrl
-  let baseUrl = 'https://app.3min.top'
-  try {
-    const _headers = await getHeaders()
-    baseUrl = getBaseUrlFromHeaders(_headers)
-  } catch (error) {
-    // 如果获取 headers 失败，使用默认值
-    console.error('Failed to get headers, using default baseUrl:', error)
-  }
+  // 使用环境变量或默认值作为 baseUrl
+  // 注意：在静态生成时不能使用 headers，所以使用环境变量
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.3min.top'
 
   // 使用缓存的查询结果
   let post
