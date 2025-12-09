@@ -11,6 +11,21 @@ const nextConfig = {
     // 在构建时进行类型检查
     ignoreBuildErrors: false,
   },
+  images: {
+    // 配置图片优化
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'app.3min.top',
+        pathname: '/api/media/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/api/media/**',
+      },
+    ],
+  },
   webpack: (webpackConfig: any) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
