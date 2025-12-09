@@ -1,5 +1,5 @@
 // Service Worker 版本号 - 更新此值以强制更新缓存
-const CACHE_VERSION = 'v0.0.1'
+const CACHE_VERSION = 'v7'
 const CACHE_NAME = `pwa-cache-${CACHE_VERSION}`
 
 // 需要预缓存的资源列表
