@@ -2,6 +2,7 @@ import React from 'react'
 import '@/app/globals.css'
 import { isValidLocale, type Locale } from '@/lib/translations'
 import { notFound } from 'next/navigation'
+import ServiceWorkerRegistration from '@/components/pwa/ServiceWorkerRegistration'
 
 type Props = {
   children: React.ReactNode
@@ -29,6 +30,7 @@ export default async function LocaleLayout(props: Props) {
   return (
     <html lang={locale}>
       <body>
+        <ServiceWorkerRegistration locale={locale} />
         <main>{children}</main>
       </body>
     </html>
