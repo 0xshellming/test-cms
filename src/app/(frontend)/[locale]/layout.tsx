@@ -2,7 +2,7 @@ import React from 'react'
 import '@/app/globals.css'
 import { isValidLocale, type Locale } from '@/lib/translations'
 import { notFound } from 'next/navigation'
-import ServiceWorkerRegistration from '@/components/pwa/ServiceWorkerRegistration'
+import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration'
 
 type Props = {
   children: React.ReactNode

@@ -11,7 +11,7 @@ import {
   DrawerFooter,
 } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
-import { BookOpen, Headphones, X } from 'lucide-react'
+import { BookOpen, Headphones, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
 type CardData = {
@@ -46,44 +46,76 @@ export function CardWithDrawer({ card, locale = 'en' }: Props) {
       <DrawerTrigger asChild>
         <div
           className={cn(
-            'flex-shrink-0 w-48 h-40 rounded-2xl shadow-md p-5 flex flex-col justify-between cursor-pointer transition-all hover:shadow-lg active:scale-[0.97] relative overflow-hidden',
+            'flex-shrink-0 w-64 h-72 rounded-2xl shadow-lg p-6',
+            'flex flex-col justify-between cursor-pointer',
+            'hover:shadow-xl transition-all active:scale-[0.98]',
+            'relative overflow-hidden',
             card.color,
           )}
         >
-          {/* 装饰性背景 */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+          {/* 多层装饰性背景 */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-tl from-black/10 to-transparent pointer-events-none" />
+
+          {/* 装饰性图案 - 右上角 */}
+          <div className="absolute top-4 right-4 opacity-15">
+            <Sparkles className="h-24 w-24 text-white" />
+          </div>
+
+          {/* 装饰性圆形 - 左下角 */}
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
 
           {/* 内容 */}
           <div className="relative z-10 flex flex-col h-full">
-            {card.icon && <div className="text-4xl mb-3">{card.icon}</div>}
-            {card.tags && (
-              <div className="flex flex-wrap gap-1 mb-2">
-                {card.tags.map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className="text-xs bg-white/70 backdrop-blur-sm px-2 py-1 rounded-md font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
+            {/* 顶部标签区域 */}
+            <div className="mb-4">
+              {card.tags && (
+                <div className="flex flex-wrap gap-1.5">
+                  {card.tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg font-bold text-gray-800 uppercase tracking-wider"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {card.subtitle && !card.tags && (
+                <span className="inline-block text-xs font-bold text-white/90 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg uppercase tracking-wider">
+                  {card.subtitle}
+                </span>
+              )}
+            </div>
+
+            {/* 中间图标区域 */}
+            {card.icon && (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-7xl transform hover:scale-110 transition-transform drop-shadow-lg">
+                  {card.icon}
+                </div>
               </div>
             )}
+
+            {/* 底部文字区域 */}
             <div className="mt-auto">
-              {card.subtitle && (
-                <p className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">
-                  {card.subtitle}
+              <h3 className="text-2xl font-bold text-white line-clamp-2 leading-tight mb-2">
+                {card.title}
+              </h3>
+              {card.description && (
+                <p className="text-sm text-white/80 line-clamp-2 leading-relaxed">
+                  {card.description}
                 </p>
               )}
-              <h3 className="font-bold text-base line-clamp-2 text-gray-900">{card.title}</h3>
             </div>
           </div>
+
+          {/* 底部装饰线 */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         </div>
       </DrawerTrigger>
       <DrawerContent className="max-h-[95vh] rounded-t-3xl">
         <div className="mx-auto w-full max-w-md">
-          {/* 拖拽指示器 */}
-          <div className="mx-auto mt-4 h-1.5 w-16 rounded-full bg-gray-300" />
-
           <DrawerHeader className="text-left px-6 pt-6 pb-4">
             <DrawerTitle className="text-2xl font-bold pr-8">{card.drawerTitle}</DrawerTitle>
             <DrawerDescription className="text-base text-gray-600 mt-2">

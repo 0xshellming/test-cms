@@ -17,9 +17,9 @@ export function HomeHeader({ locale }: Props) {
         {/* 品牌标识 */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-            <span className="text-white font-bold text-sm">H</span>
+            <span className="text-white font-bold text-sm">3m</span>
           </div>
-          <span className="text-lg font-semibold">Headway</span>
+          <span className="text-lg font-semibold">三分钟阅读</span>
         </div>
 
         {/* 右侧按钮 */}

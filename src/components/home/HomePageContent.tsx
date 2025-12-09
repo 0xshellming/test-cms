@@ -26,15 +26,15 @@ export function HomePageContent({ locale }: Props) {
       title: 'STEAL Like an Artist',
       description: '10 things nobody told you about being creative',
       author: 'Austin Kleon',
-      coverColor: 'bg-pink-200',
+      coverColor: 'bg-gradient-to-br from-pink-500 to-rose-600',
       coverIcon: '✋',
     },
     {
       id: '2',
-      title: 'THE EDUCATION OF MILLION-AIRES',
+      title: 'THE EDUCATION OF MILLIONAIRES',
       description: "Everything you won't learn in college about how to be successful",
       author: 'Michael Ellsberg',
-      coverColor: 'bg-red-200',
+      coverColor: 'bg-gradient-to-br from-red-500 to-orange-600',
       coverIcon: '🦁',
     },
     {
@@ -42,7 +42,7 @@ export function HomePageContent({ locale }: Props) {
       title: 'Unlock Me',
       description: 'A guide to personal growth',
       author: 'Kevin Ho',
-      coverColor: 'bg-blue-200',
+      coverColor: 'bg-gradient-to-br from-blue-600 to-indigo-700',
       coverIcon: '🔓',
     },
   ]
@@ -59,25 +59,25 @@ export function HomePageContent({ locale }: Props) {
       id: '1',
       title: 'The Practice',
       icon: '🎯',
-      color: 'bg-gradient-to-br from-purple-400 to-pink-400',
+      color: 'bg-gradient-to-br from-purple-600 to-pink-600',
     },
     {
       id: '2',
       title: 'The TB12 Method',
       icon: '👕',
-      color: 'bg-gradient-to-br from-yellow-300 to-orange-300',
+      color: 'bg-gradient-to-br from-yellow-500 to-orange-600',
     },
     {
       id: '3',
       title: 'The Obesity Code',
       icon: '📊',
-      color: 'bg-gradient-to-br from-orange-400 to-red-400',
+      color: 'bg-gradient-to-br from-orange-600 to-red-600',
     },
     {
       id: '4',
       title: 'More Than This',
       icon: '❤️',
-      color: 'bg-gradient-to-br from-purple-500 to-pink-500',
+      color: 'bg-gradient-to-br from-rose-600 to-pink-700',
     },
   ]
 

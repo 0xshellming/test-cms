@@ -1,7 +1,6 @@
 'use client'
 
-import { Bookmark } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Bookmark, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type BookItem = {
@@ -24,28 +23,46 @@ export function BookRecommendations({ items }: Props) {
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex-shrink-0 w-64 bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all cursor-pointer active:scale-[0.98]"
+            className={cn(
+              'flex-shrink-0 w-56 h-72 rounded-2xl shadow-lg p-6',
+              'flex flex-col cursor-pointer',
+              'hover:shadow-xl transition-all active:scale-[0.98]',
+              'relative overflow-hidden',
+              item.coverColor,
+            )}
           >
-            {/* 书封 */}
-            <div className={cn(item.coverColor, 'h-52 flex items-center justify-center relative')}>
-              <span className="text-7xl">{item.coverIcon}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-3 right-3 bg-white/90 hover:bg-white rounded-full h-9 w-9 shadow-sm"
-              >
-                <Bookmark className="h-5 w-5 text-gray-700" />
-              </Button>
+            {/* 装饰性背景 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+            <div className="absolute top-4 right-4 opacity-10">
+              <Sparkles className="h-20 w-20 text-white" />
             </div>
 
+            {/* 书签按钮 */}
+            <button className="absolute top-4 right-4 z-20 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-full h-9 w-9 flex items-center justify-center transition-all">
+              <Bookmark className="h-5 w-5 text-white" />
+            </button>
+
             {/* 内容 */}
-            <div className="p-5">
-              <h3 className="font-bold text-lg mb-2 line-clamp-2 text-gray-900">{item.title}</h3>
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
-                {item.description}
-              </p>
-              <p className="text-xs text-gray-500 font-medium">{item.author}</p>
+            <div className="relative z-10 flex flex-col h-full">
+              {/* 图标/封面 */}
+              <div className="text-7xl mb-4 flex items-center justify-center h-24">
+                {item.coverIcon}
+              </div>
+
+              {/* 文字内容 */}
+              <div className="mt-auto">
+                <h3 className="text-xl font-bold text-white line-clamp-2 mb-3 leading-tight">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-white/90 line-clamp-2 mb-3 leading-relaxed">
+                  {item.description}
+                </p>
+                <p className="text-xs text-white/80 font-medium">{item.author}</p>
+              </div>
             </div>
+
+            {/* 底部装饰线 */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
           </div>
         ))}
       </div>

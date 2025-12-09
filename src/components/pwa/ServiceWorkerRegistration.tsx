@@ -7,7 +7,7 @@ type Props = {
   locale: Locale
 }
 
-export default function ServiceWorkerRegistration({ locale }: Props) {
+export function ServiceWorkerRegistration({ locale }: Props): React.ReactNode {
   const t = createTranslator(locale)
   const [isOnline, setIsOnline] = useState(true)
   const [swRegistration, setSwRegistration] = useState<globalThis.ServiceWorkerRegistration | null>(
