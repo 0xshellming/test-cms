@@ -37,7 +37,15 @@ export function getAbsoluteImageUrl(url: string | null | undefined, baseUrl?: st
  * @returns 基础 URL（包含协议和域名）
  */
 export function getBaseUrlFromHeaders(headers: Headers): string {
-  const protocol = headers.get('x-forwarded-proto') || 'https'
-  const host = headers.get('host') || headers.get('x-forwarded-host') || 'app.3min.top'
-  return `${protocol}://${host}`
+  try {
+    const forwardedProto = headers.get('x-forwarded-proto')
+    const cfVisitor = headers.get('cf-visitor')
+    const protocol = forwardedProto || (cfVisitor?.includes('https') ? 'https' : 'https')
+    const host = headers.get('host') || headers.get('x-forwarded-host') || 'app.3min.top'
+    return `${protocol}://${host}`
+  } catch (error) {
+    // 如果获取失败，返回默认值
+    console.error('Failed to get base URL from headers:', error)
+    return 'https://app.3min.top'
+  }
 }

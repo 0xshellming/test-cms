@@ -2,7 +2,7 @@ import { headers as getHeaders } from 'next/headers.js'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
 
 import LocaleSwitcher from '@/components/LocaleSwitcher'
@@ -85,8 +85,15 @@ export default async function BlogPostPage(props: Props) {
   const locale = localeParam as Locale
   const t = createTranslator(locale)
 
-  const _headers = await getHeaders()
-  const baseUrl = getBaseUrlFromHeaders(_headers)
+  // 安全地获取 headers 和 baseUrl
+  let baseUrl = 'https://app.3min.top'
+  try {
+    const _headers = await getHeaders()
+    baseUrl = getBaseUrlFromHeaders(_headers)
+  } catch (error) {
+    // 如果获取 headers 失败，使用默认值
+    console.error('Failed to get headers, using default baseUrl:', error)
+  }
 
   // 使用缓存的查询结果
   let post
@@ -101,8 +108,22 @@ export default async function BlogPostPage(props: Props) {
   if (!post) {
     notFound()
   }
+
+  // 安全地获取字段值
+  const postTitle = post.title || t('blog.blogPost')
   const featuredImage =
     typeof post.featuredImage === 'object' && post.featuredImage ? post.featuredImage : null
+
+  // 安全地转换内容
+  let contentHtml = ''
+  try {
+    if (typeof post.content === 'object' && post.content) {
+      contentHtml = convertLexicalToHTML({ data: post.content })
+    }
+  } catch (error) {
+    console.error(`Failed to convert content for post ${slug}:`, error)
+    contentHtml = ''
+  }
 
   return (
     <div className="blog-container">
@@ -111,15 +132,17 @@ export default async function BlogPostPage(props: Props) {
           <Link href={`/${locale}/blog`} className="back-link">
             ← {t('blog.backToBlog')}
           </Link>
-          <LocaleSwitcher currentLocale={locale} />
+          <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
+            <LocaleSwitcher currentLocale={locale} />
+          </Suspense>
         </div>
       </header>
 
       <article className="blog-post">
-        <h1>{post.title}</h1>
+        <h1>{postTitle}</h1>
 
         <div className="post-header-meta">
-          {post.publishedDate && (
+          {post.publishedDate && typeof post.publishedDate === 'string' && (
             <time dateTime={post.publishedDate}>
               {new Date(post.publishedDate).toLocaleDateString(
                 locale === 'zh' ? 'zh-CN' : 'en-US',
@@ -143,7 +166,7 @@ export default async function BlogPostPage(props: Props) {
           <div className="featured-image">
             <Image
               src={getAbsoluteImageUrl(featuredImage.url, baseUrl)}
-              alt={featuredImage.alt || post.title || ''}
+              alt={featuredImage.alt || postTitle}
               width={1200}
               height={600}
               style={{
@@ -155,17 +178,13 @@ export default async function BlogPostPage(props: Props) {
           </div>
         )}
 
-        {post.excerpt && <p className="post-excerpt-large">{post.excerpt}</p>}
+        {post.excerpt && typeof post.excerpt === 'string' && (
+          <p className="post-excerpt-large">{post.excerpt}</p>
+        )}
 
-        <div className="post-content-rich">
-          {typeof post.content === 'object' && post.content && (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: convertLexicalToHTML({ data: post.content }),
-              }}
-            />
-          )}
-        </div>
+        {contentHtml && (
+          <div className="post-content-rich" dangerouslySetInnerHTML={{ __html: contentHtml }} />
+        )}
       </article>
     </div>
   )
