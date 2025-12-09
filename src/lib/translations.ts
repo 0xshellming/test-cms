@@ -26,6 +26,25 @@ export const translations = {
       error: '发生错误',
       switchLanguage: '切换语言',
     },
+    pwa: {
+      install: {
+        title: '安装应用',
+        button: '添加到主屏幕',
+        iosInstructions: '要在 iOS 设备上安装此应用，请点击分享按钮',
+        iosInstructionsEnd: '然后选择"添加到主屏幕"',
+        alreadyInstalled: '应用已安装',
+      },
+      push: {
+        title: '推送通知',
+        subscribed: '您已订阅推送通知',
+        notSubscribed: '您尚未订阅推送通知',
+        subscribe: '订阅',
+        unsubscribe: '取消订阅',
+        enterMessage: '输入通知消息',
+        sendTest: '发送测试',
+        notSupported: '此浏览器不支持推送通知',
+      },
+    },
   },
   en: {
     home: {
@@ -50,6 +69,25 @@ export const translations = {
       loading: 'Loading...',
       error: 'An error occurred',
       switchLanguage: 'Switch language',
+    },
+    pwa: {
+      install: {
+        title: 'Install App',
+        button: 'Add to Home Screen',
+        iosInstructions: 'To install this app on your iOS device, tap the share button',
+        iosInstructionsEnd: 'and then "Add to Home Screen"',
+        alreadyInstalled: 'App is already installed',
+      },
+      push: {
+        title: 'Push Notifications',
+        subscribed: 'You are subscribed to push notifications',
+        notSubscribed: 'You are not subscribed to push notifications',
+        subscribe: 'Subscribe',
+        unsubscribe: 'Unsubscribe',
+        enterMessage: 'Enter notification message',
+        sendTest: 'Send Test',
+        notSupported: 'Push notifications are not supported in this browser',
+      },
     },
   },
 } as const

@@ -3,6 +3,7 @@ import { createTranslator, type Locale, isValidLocale } from '@/lib/translations
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
+import { PushNotificationManager, InstallPrompt } from '@/components/pwa'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -79,6 +80,23 @@ export default async function HomePage(props: Props) {
           >
             {t('home.admin')} →
           </Link>
+        </div>
+
+        {/* PWA 功能区域 */}
+        <div
+          style={{
+            marginTop: '60px',
+            padding: '30px',
+            border: '1px solid rgb(100, 100, 100)',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(100, 100, 100, 0.05)',
+          }}
+        >
+          <h2 style={{ marginBottom: '30px', fontSize: '24px' }}>PWA 功能</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+            <InstallPrompt locale={locale} />
+            <PushNotificationManager locale={locale} />
+          </div>
         </div>
       </div>
     </div>
