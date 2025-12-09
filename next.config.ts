@@ -36,8 +36,7 @@ const nextConfig: NextConfig = {
   },
   // 压缩配置
   compress: true,
-  // 生产环境优化
-  swcMinify: true,
+  // 注意：swcMinify 在 Next.js 15 中已废弃，默认启用
   webpack: (webpackConfig: any) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

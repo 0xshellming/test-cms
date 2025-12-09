@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 import './blog.css'
 import { Tag } from '@/payload-types'
@@ -65,7 +65,9 @@ export default async function BlogPage(props: Props) {
           <Link href={`/${locale}`} className="back-link">
             ← {t('blog.backToHome')}
           </Link>
-          <LocaleSwitcher currentLocale={locale} />
+          <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
+            <LocaleSwitcher currentLocale={locale} />
+          </Suspense>
         </div>
         <h1>{t('blog.title')}</h1>
       </header>
