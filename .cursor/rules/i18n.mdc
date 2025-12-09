@@ -284,6 +284,60 @@ export default function ClientComponent() {
 }
 ```
 
+### 使用 useSearchParams 的组件（Next.js 15 要求）
+
+**⚠️ 重要：在 Next.js 15 中，使用 `useSearchParams()` 的客户端组件必须被 `Suspense` 边界包裹，否则构建会失败。**
+
+**✅ 正确做法：**
+
+```typescript
+// Server Component (page.tsx)
+import { Suspense } from 'react'
+import LocaleSwitcher from '@/components/LocaleSwitcher'
+
+export default async function Page({ params }: Props) {
+  const { locale } = await params
+  
+  return (
+    <div>
+      <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
+        <LocaleSwitcher currentLocale={locale} />
+      </Suspense>
+    </div>
+  )
+}
+```
+
+```typescript
+// Client Component (LocaleSwitcher.tsx)
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
+export default function LocaleSwitcher() {
+  const searchParams = useSearchParams()  // 需要 Suspense 包裹
+  // ...
+}
+```
+
+**❌ 错误做法：**
+
+```typescript
+// 直接使用会导致构建错误
+export default async function Page({ params }: Props) {
+  return (
+    <div>
+      <LocaleSwitcher />  // ❌ 缺少 Suspense 包裹
+    </div>
+  )
+}
+```
+
+**错误信息：**
+```
+⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[locale]"
+```
+
 ### 语言切换器
 
 **使用路径替换，不使用查询参数：**
@@ -429,6 +483,105 @@ export const revalidate = 3600  // 每小时重新生成
 
 ---
 
+## 🔧 Next.js 15 特殊要求和构建实践
+
+### useSearchParams 的 Suspense 要求
+
+**在 Next.js 15 中，所有使用 `useSearchParams()` 的客户端组件必须被 `Suspense` 边界包裹。**
+
+**原因：** Next.js 15 要求在静态生成时，使用 `useSearchParams()` 的组件必须提供 Suspense 边界，以便在构建时正确处理。
+
+**实践：**
+
+1. **识别使用 useSearchParams 的组件**
+   - 检查客户端组件中是否使用了 `useSearchParams()`
+   - 常见场景：语言切换器、搜索组件、筛选组件
+
+2. **在 Server Component 中包裹**
+   ```typescript
+   import { Suspense } from 'react'
+   
+   export default async function Page({ params }: Props) {
+     return (
+       <div>
+         <Suspense fallback={<LoadingPlaceholder />}>
+           <ComponentWithSearchParams />
+         </Suspense>
+       </div>
+     )
+   }
+   ```
+
+3. **提供合适的 fallback**
+   - 使用与组件尺寸匹配的占位符
+   - 避免布局偏移（CLS）
+   ```typescript
+   <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
+     <LocaleSwitcher />
+   </Suspense>
+   ```
+
+### Next.js 配置类型安全
+
+**在 `next.config.ts` 中使用正确的类型定义：**
+
+**✅ 正确做法：**
+
+```typescript
+import { withPayload } from '@payloadcms/next/withPayload'
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https' as const,  // 使用 as const 确保类型正确
+        hostname: 'example.com',
+        pathname: '/api/media/**',
+      },
+    ],
+  },
+  // ... 其他配置
+}
+
+export default withPayload(nextConfig, { devBundleServerPackages: false })
+```
+
+**❌ 错误做法：**
+
+```typescript
+// 缺少类型定义会导致构建错误
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',  // ❌ 类型不匹配
+        hostname: 'example.com',
+        pathname: '/api/media/**',
+      },
+    ],
+  },
+}
+```
+
+**错误信息：**
+```
+Type '{ protocol: string; hostname: string; pathname: string; }' 
+is not assignable to type 'URL | RemotePattern'
+```
+
+### 构建时检查清单
+
+在部署前，确保：
+
+- [ ] 所有使用 `useSearchParams()` 的组件都被 `Suspense` 包裹
+- [ ] `next.config.ts` 使用正确的 TypeScript 类型
+- [ ] `remotePatterns` 中的 `protocol` 使用 `as const`
+- [ ] 所有硬编码的文本都已替换为翻译函数
+- [ ] 运行 `npm run build` 验证构建成功
+
+---
+
 ## 📝 代码审查清单
 
 在提交代码前，检查：
@@ -441,7 +594,10 @@ export const revalidate = 3600  // 每小时重新生成
 - [ ] 新增翻译已添加到所有支持的语言
 - [ ] 翻译键遵循命名规范（命名空间.功能.描述）
 - [ ] 没有混淆 I18n 和 Localization
+- [ ] 使用 `useSearchParams()` 的组件被 `Suspense` 包裹（Next.js 15）
+- [ ] `next.config.ts` 使用正确的 TypeScript 类型
 - [ ] TypeScript 类型检查通过
+- [ ] 运行 `npm run build` 验证构建成功
 - [ ] 测试了所有支持的语言
 
 ---
@@ -505,6 +661,62 @@ t('Blog-Author')
 t('blog.title')
 t('blog.description')
 t('blog.author')
+```
+
+### 错误 6: 缺少 Suspense 边界（Next.js 15）
+
+```typescript
+// ❌ 错误：直接使用包含 useSearchParams 的组件
+export default async function Page({ params }: Props) {
+  return (
+    <div>
+      <LocaleSwitcher />  // 会导致构建失败
+    </div>
+  )
+}
+
+// ✅ 正确：使用 Suspense 包裹
+import { Suspense } from 'react'
+
+export default async function Page({ params }: Props) {
+  return (
+    <div>
+      <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
+        <LocaleSwitcher />
+      </Suspense>
+    </div>
+  )
+}
+```
+
+### 错误 7: Next.js 配置类型错误
+
+```typescript
+// ❌ 错误：缺少类型定义和 as const
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',  // 类型不匹配
+        hostname: 'example.com',
+      },
+    ],
+  },
+}
+
+// ✅ 正确：使用 NextConfig 类型和 as const
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https' as const,  // 类型正确
+        hostname: 'example.com',
+      },
+    ],
+  },
+}
 ```
 
 ---
@@ -574,24 +786,37 @@ localization: {
 
 1. **检查是否涉及用户界面文本**
    - 如果是，使用翻译系统，不要硬编码
+   - 检查代码中是否有三元表达式 `locale === 'zh' ? '中文' : 'English'`
 
 2. **检查是否创建新链接**
    - 确保包含 `/${locale}` 前缀
+   - 验证所有 `Link` 组件的 `href` 属性
 
 3. **检查是否处理日期/时间**
    - 使用动态 locale 格式化
+   - 避免硬编码 locale 字符串
 
 4. **检查是否创建新路由**
    - 验证 locale 参数
    - 生成静态参数
+   - 添加 `generateStaticParams()` 函数
 
 5. **检查是否添加新翻译**
    - 为所有支持的语言添加翻译
-   - 遵循命名规范
+   - 遵循命名规范（命名空间.功能.描述）
 
-6. **提醒用户测试**
+6. **检查客户端组件**
+   - 如果使用 `useSearchParams()`，确保在 Server Component 中用 `Suspense` 包裹
+   - 检查是否有构建错误相关的 Suspense 警告
+
+7. **检查构建配置**
+   - 验证 `next.config.ts` 使用正确的类型
+   - 确保 `remotePatterns` 中的 `protocol` 使用 `as const`
+
+8. **提醒用户测试**
    - 测试所有支持的语言
    - 验证类型安全
+   - 运行 `npm run build` 确保构建成功
 
 ---
 

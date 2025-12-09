@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
 
 type Props = {
@@ -22,7 +23,9 @@ export default async function HomePage(props: Props) {
       <header className="blog-header">
         <div className="blog-header-top">
           <h1>{locale === 'zh' ? '欢迎' : 'Welcome'}</h1>
-          <LocaleSwitcher currentLocale={locale} />
+          <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
+            <LocaleSwitcher currentLocale={locale} />
+          </Suspense>
         </div>
       </header>
 

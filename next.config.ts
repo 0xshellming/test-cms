@@ -1,7 +1,7 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import type { NextConfig } from 'next'
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   // Your Next.js config here
   eslint: {
     // 在构建时运行 ESLint
@@ -15,12 +15,12 @@ const nextConfig = {
     // 配置图片优化
     remotePatterns: [
       {
-        protocol: 'https',
+        protocol: 'https' as const,
         hostname: 'app.3min.top',
         pathname: '/api/media/**',
       },
       {
-        protocol: 'http',
+        protocol: 'http' as const,
         hostname: 'localhost',
         pathname: '/api/media/**',
       },
