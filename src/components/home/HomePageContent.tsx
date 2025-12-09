@@ -106,7 +106,7 @@ export function HomePageContent({ locale }: Props) {
       {/* 主内容区域 */}
       <main className="flex-1 px-4 space-y-6 pb-4 pt-4">
         {/* 今日首要任务 */}
-        <FirstForToday locale={locale} />
+        {/* <FirstForToday locale={locale} /> */}
 
         {/* 每日免费阅读推广 */}
         <FreeDailyRead locale={locale} />

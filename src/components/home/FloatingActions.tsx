@@ -35,3 +35,4 @@ export function FloatingActions({ locale }: Props) {
     </div>
   )
 }
+

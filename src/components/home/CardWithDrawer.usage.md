@@ -132,3 +132,4 @@ color: 'bg-purple-500'                                    // 单色背景
 - **Icons**: lucide-react
 - **Styling**: Tailwind CSS
 - **Animation**: vaul 内置动画
+
