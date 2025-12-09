@@ -9,6 +9,7 @@ import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
 import config from '@/payload.config'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
 import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
+import { getAbsoluteImageUrl, getBaseUrlFromHeaders } from '@/lib/image-url'
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>
@@ -76,6 +77,7 @@ export default async function BlogPostPage(props: Props) {
   const t = createTranslator(locale)
 
   const _headers = await getHeaders()
+  const baseUrl = getBaseUrlFromHeaders(_headers)
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
@@ -147,7 +149,7 @@ export default async function BlogPostPage(props: Props) {
         {featuredImage && typeof featuredImage.url === 'string' && (
           <div className="featured-image">
             <Image
-              src={featuredImage.url}
+              src={getAbsoluteImageUrl(featuredImage.url, baseUrl)}
               alt={featuredImage.alt || post.title || ''}
               width={1200}
               height={600}

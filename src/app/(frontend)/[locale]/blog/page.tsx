@@ -9,6 +9,7 @@ import './blog.css'
 import { Tag } from '@/payload-types'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
 import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
+import { getAbsoluteImageUrl, getBaseUrlFromHeaders } from '@/lib/image-url'
 import { notFound } from 'next/navigation'
 
 type Props = {
@@ -43,6 +44,7 @@ export default async function BlogPage(props: Props) {
   const t = createTranslator(locale)
 
   const _headers = await getHeaders()
+  const baseUrl = getBaseUrlFromHeaders(_headers)
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
@@ -93,7 +95,7 @@ export default async function BlogPage(props: Props) {
                   {featuredImage && typeof featuredImage.url === 'string' && (
                     <div className="post-image" data-url={featuredImage.url || '-'}>
                       <Image
-                        src={featuredImage.url}
+                        src={getAbsoluteImageUrl(featuredImage.url, baseUrl)}
                         alt={featuredImage.alt || post.title || ''}
                         width={400}
                         height={250}
