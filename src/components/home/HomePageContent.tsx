@@ -59,7 +59,7 @@ export function HomePageContent({ locale }: Props) {
       id: '1',
       title: 'The Practice',
       icon: '🎯',
-      color: 'bg-gradient-to-br from-purple-600 to-pink-600',
+      color: 'bg-gradient-to-br from-purple-500 to-pink-600',
     },
     {
       id: '2',
@@ -71,13 +71,13 @@ export function HomePageContent({ locale }: Props) {
       id: '3',
       title: 'The Obesity Code',
       icon: '📊',
-      color: 'bg-gradient-to-br from-orange-600 to-red-600',
+      color: 'bg-gradient-to-br from-orange-500 to-red-600',
     },
     {
       id: '4',
       title: 'More Than This',
       icon: '❤️',
-      color: 'bg-gradient-to-br from-rose-600 to-pink-700',
+      color: 'bg-gradient-to-br from-rose-500 to-pink-600',
     },
   ]
 

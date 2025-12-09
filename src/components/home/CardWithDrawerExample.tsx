@@ -25,7 +25,7 @@ export function CardWithDrawerExample({ locale }: Props) {
       subtitle: 'SUMMARY',
       description: 'Transform your approach to learning',
       icon: '💎',
-      color: 'bg-gradient-to-br from-blue-600 to-yellow-500',
+      color: 'bg-gradient-to-br from-blue-500 to-yellow-500',
       tags: ['GEMS'],
       drawerTitle: 'Learn Like a CEO',
       drawerDescription: 'based on titles by James Clear, William H. McRaven, and Stephen R. Covey',
@@ -62,7 +62,7 @@ export function CardWithDrawerExample({ locale }: Props) {
       subtitle: 'SUMMARY',
       description: 'How to make better decisions under uncertainty and pressure',
       icon: '🤔',
-      color: 'bg-gradient-to-br from-green-600 to-green-700',
+      color: 'bg-gradient-to-br from-emerald-500 to-green-600',
       drawerTitle: 'Effective Decision-Making',
       drawerDescription: 'Learn proven frameworks for making smart decisions in complex situations',
       drawerContent: [
@@ -98,7 +98,7 @@ export function CardWithDrawerExample({ locale }: Props) {
       subtitle: 'SUMMARY',
       description: 'Discover the perfect career through personality type',
       icon: '❤️',
-      color: 'bg-gradient-to-br from-blue-600 to-purple-600',
+      color: 'bg-gradient-to-br from-blue-500 to-purple-600',
       drawerTitle: 'Do What You Are',
       drawerDescription:
         'Find career fulfillment by understanding your personality type and natural strengths',
