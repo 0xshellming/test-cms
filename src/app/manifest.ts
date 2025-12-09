@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: '3MinTop',
     short_name: '3MinTop',
     description: '3MinTop is a platform for learning and sharing knowledge',
-    start_url: '/',
+    start_url: '/zh',
     display: 'standalone',
     background_color: '#ffffff',
     theme_color: '#000000',

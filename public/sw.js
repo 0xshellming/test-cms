@@ -3,7 +3,7 @@ const CACHE_VERSION = 'v8'
 const CACHE_NAME = `pwa-cache-${CACHE_VERSION}`
 
 // 需要预缓存的资源列表（不包含根路径，避免缓存重定向）
-const PRECACHE_URLS = ['/icon-192x192.png', '/icon-512x512.png']
+const PRECACHE_URLS = ['/', '/icon-192x192.png', '/icon-512x512.png']
 
 // 安装事件 - 预缓存关键资源
 self.addEventListener('install', (event) => {
