@@ -9,6 +9,8 @@ import { r2Storage } from '@payloadcms/storage-r2'
 import { en } from '@payloadcms/translations/languages/en'
 import { zh } from '@payloadcms/translations/languages/zh'
 
+import { migrations } from './migrations'
+
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
@@ -39,7 +41,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
+  db: sqliteD1Adapter({ binding: cloudflare.env.D1, prodMigrations: migrations }),
   i18n: {
     fallbackLanguage: 'en',
     supportedLanguages: { en, zh },
