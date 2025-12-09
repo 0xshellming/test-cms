@@ -1,11 +1,11 @@
-import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import type { Locale } from '@/lib/translations'
 
 /**
- * 缓存 Payload 查询结果
- * 使用 Next.js 的 unstable_cache 来缓存数据，减少数据库查询
+ * 获取 Payload 实例
+ * 注意：在 Cloudflare Workers 环境中，不使用 unstable_cache
+ * 依赖 Next.js 的 ISR (revalidate) 来缓存页面
  */
 export async function getCachedPayload() {
   const payloadConfig = await config
@@ -13,110 +13,104 @@ export async function getCachedPayload() {
 }
 
 /**
- * 获取缓存的博客文章列表
- * 缓存时间：1小时（3600秒）
+ * 获取博客文章列表
+ * 注意：在 Cloudflare Workers 环境中，直接查询数据库
+ * 页面级别的缓存通过 Next.js ISR (revalidate) 实现
  */
 export async function getCachedPosts(locale: Locale, limit = 20) {
-  const payload = await getCachedPayload()
+  try {
+    const payload = await getCachedPayload()
 
-  return unstable_cache(
-    async () => {
-      return await payload.find({
-        collection: 'posts',
-        where: {
-          _status: {
-            equals: 'published',
-          },
+    return await payload.find({
+      collection: 'posts',
+      where: {
+        _status: {
+          equals: 'published',
         },
-        sort: '-publishedDate',
-        limit,
-        depth: 1, // 减少 depth 以提高性能
-        draft: false,
-        locale,
-      })
-    },
-    [`posts-${locale}-${limit}`], // 缓存键
-    {
-      revalidate: 3600, // 1小时重新验证
-      tags: [`posts-${locale}`], // 标签用于按需重新验证
-    },
-  )()
+      },
+      sort: '-publishedDate',
+      limit,
+      depth: 1, // 减少 depth 以提高性能
+      draft: false,
+      locale,
+    })
+  } catch (error) {
+    // 记录错误并重新抛出，让调用者处理
+    console.error(`Error fetching posts for locale ${locale}:`, error)
+    throw error
+  }
 }
 
 /**
- * 获取缓存的博客文章详情
- * 缓存时间：1小时（3600秒）
+ * 获取博客文章详情
+ * 注意：在 Cloudflare Workers 环境中，直接查询数据库
+ * 页面级别的缓存通过 Next.js ISR (revalidate) 实现
  */
 export async function getCachedPost(slug: string, locale: Locale) {
-  const payload = await getCachedPayload()
+  try {
+    const payload = await getCachedPayload()
 
-  return unstable_cache(
-    async () => {
-      const posts = await payload.find({
-        collection: 'posts',
-        where: {
-          and: [
-            {
-              slug: {
-                equals: slug,
-              },
+    const posts = await payload.find({
+      collection: 'posts',
+      where: {
+        and: [
+          {
+            slug: {
+              equals: slug,
             },
-            {
-              _status: {
-                equals: 'published',
-              },
+          },
+          {
+            _status: {
+              equals: 'published',
             },
-          ],
-        },
-        limit: 1,
-        depth: 2, // 详情页需要更多关联数据
-        draft: false,
-        locale,
-      })
+          },
+        ],
+      },
+      limit: 1,
+      depth: 2, // 详情页需要更多关联数据
+      draft: false,
+      locale,
+    })
 
-      return posts.docs[0] || null
-    },
-    [`post-${slug}-${locale}`], // 缓存键
-    {
-      revalidate: 3600, // 1小时重新验证
-      tags: [`post-${slug}-${locale}`, `posts-${locale}`], // 标签用于按需重新验证
-    },
-  )()
+    return posts.docs[0] || null
+  } catch (error) {
+    // 记录错误并重新抛出，让调用者处理
+    console.error(`Error fetching post ${slug} for locale ${locale}:`, error)
+    throw error
+  }
 }
 
 /**
  * 获取所有已发布的博客文章 slug（用于静态生成）
- * 缓存时间：1小时（3600秒）
+ * 注意：在构建时调用，如果失败则返回空数组，让页面在运行时生成
  */
 export async function getCachedPostSlugs(locale: Locale) {
-  const payload = await getCachedPayload()
+  try {
+    const payload = await getCachedPayload()
 
-  return unstable_cache(
-    async () => {
-      const posts = await payload.find({
-        collection: 'posts',
-        where: {
-          _status: {
-            equals: 'published',
-          },
+    const posts = await payload.find({
+      collection: 'posts',
+      where: {
+        _status: {
+          equals: 'published',
         },
-        select: {
-          slug: true,
-        },
-        limit: 1000, // 假设最多1000篇文章
-        depth: 0, // 不需要关联数据
-        draft: false,
-        locale,
-      })
+      },
+      select: {
+        slug: true,
+      },
+      limit: 1000, // 假设最多1000篇文章
+      depth: 0, // 不需要关联数据
+      draft: false,
+      locale,
+    })
 
-      return posts.docs
-        .map((post) => post.slug)
-        .filter((slug): slug is string => typeof slug === 'string')
-    },
-    [`post-slugs-${locale}`], // 缓存键
-    {
-      revalidate: 3600, // 1小时重新验证
-      tags: [`posts-${locale}`], // 标签用于按需重新验证
-    },
-  )()
+    return posts.docs
+      .map((post) => post.slug)
+      .filter((slug): slug is string => typeof slug === 'string')
+  } catch (error) {
+    // 在构建时如果无法获取数据，返回空数组
+    // 页面将在运行时通过 ISR 生成
+    console.error(`Failed to get post slugs for locale ${locale}:`, error)
+    return []
+  }
 }

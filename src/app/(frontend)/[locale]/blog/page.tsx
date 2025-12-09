@@ -49,7 +49,14 @@ export default async function BlogPage(props: Props) {
   const baseUrl = getBaseUrlFromHeaders(_headers)
 
   // 使用缓存的查询结果
-  const posts = await getCachedPosts(locale, 20)
+  let posts
+  try {
+    posts = await getCachedPosts(locale, 20)
+  } catch (error) {
+    // 如果查询失败，记录错误并显示空状态
+    console.error(`Failed to fetch posts for locale ${locale}:`, error)
+    posts = { docs: [] }
+  }
 
   return (
     <div className="blog-container">

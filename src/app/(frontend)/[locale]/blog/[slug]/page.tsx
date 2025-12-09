@@ -24,21 +24,30 @@ export async function generateMetadata(props: Props) {
   const locale = localeParam as Locale
   const t = createTranslator(locale)
 
-  const post = await getCachedPost(slug, locale)
+  try {
+    const post = await getCachedPost(slug, locale)
 
-  if (!post) {
-    return {
-      title: t('blog.postNotFound'),
+    if (!post) {
+      return {
+        title: t('blog.postNotFound'),
+      }
     }
-  }
 
-  return {
-    title: post.title || t('blog.blogPost'),
-    description: post.excerpt || undefined,
+    return {
+      title: post.title || t('blog.blogPost'),
+      description: post.excerpt || undefined,
+    }
+  } catch (error) {
+    // 如果获取元数据失败，返回默认值
+    console.error(`Failed to generate metadata for post ${slug}:`, error)
+    return {
+      title: t('blog.blogPost'),
+    }
   }
 }
 
 // 生成所有博客文章的静态参数
+// 注意：如果构建时无法获取数据，返回空数组，页面将在运行时通过 ISR 生成
 export async function generateStaticParams() {
   const locales: Locale[] = ['zh', 'en']
   const params: Array<{ locale: string; slug: string }> = []
@@ -46,14 +55,19 @@ export async function generateStaticParams() {
   for (const locale of locales) {
     try {
       const slugs = await getCachedPostSlugs(locale)
-      for (const slug of slugs) {
-        params.push({ locale, slug })
+      if (slugs.length > 0) {
+        for (const slug of slugs) {
+          params.push({ locale, slug })
+        }
       }
     } catch (error) {
+      // 构建时失败不影响运行时，页面将通过 ISR 生成
       console.error(`Failed to generate static params for locale ${locale}:`, error)
     }
   }
 
+  // 如果构建时无法获取任何数据，返回空数组
+  // Next.js 会在首次请求时通过 ISR 生成页面
   return params
 }
 
@@ -75,7 +89,14 @@ export default async function BlogPostPage(props: Props) {
   const baseUrl = getBaseUrlFromHeaders(_headers)
 
   // 使用缓存的查询结果
-  const post = await getCachedPost(slug, locale)
+  let post
+  try {
+    post = await getCachedPost(slug, locale)
+  } catch (error) {
+    // 如果查询失败，记录错误并返回 404
+    console.error(`Failed to fetch post ${slug} for locale ${locale}:`, error)
+    notFound()
+  }
 
   if (!post) {
     notFound()
