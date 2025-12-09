@@ -7,15 +7,23 @@ import React from 'react'
 import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
 
 import config from '@/payload.config'
-import '../../styles.css'
-import '../blog.css'
+import LocaleSwitcher from '@/components/LocaleSwitcher'
+import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ locale: string; slug: string }>
 }
 
 export async function generateMetadata(props: Props) {
-  const { slug } = await props.params
+  const { locale: localeParam, slug } = await props.params
+
+  if (!isValidLocale(localeParam)) {
+    return { title: 'Not Found' }
+  }
+
+  const locale = localeParam as Locale
+  const t = createTranslator(locale)
+
   const _headers = await getHeaders()
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
@@ -39,24 +47,34 @@ export async function generateMetadata(props: Props) {
     limit: 1,
     depth: 2,
     draft: false,
+    locale: locale,
   })
 
   if (posts.docs.length === 0) {
     return {
-      title: '文章未找到',
+      title: t('blog.postNotFound'),
     }
   }
 
   const post = posts.docs[0]
 
   return {
-    title: post.title || '博客文章',
+    title: post.title || t('blog.blogPost'),
     description: post.excerpt || undefined,
   }
 }
 
 export default async function BlogPostPage(props: Props) {
-  const { slug } = await props.params
+  const { locale: localeParam, slug } = await props.params
+
+  // 验证 locale
+  if (!isValidLocale(localeParam)) {
+    notFound()
+  }
+
+  const locale = localeParam as Locale
+  const t = createTranslator(locale)
+
   const _headers = await getHeaders()
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
@@ -80,6 +98,7 @@ export default async function BlogPostPage(props: Props) {
     limit: 1,
     depth: 2,
     draft: false,
+    locale: locale,
   })
 
   if (posts.docs.length === 0) {
@@ -93,9 +112,12 @@ export default async function BlogPostPage(props: Props) {
   return (
     <div className="blog-container">
       <header className="blog-header">
-        <Link href="/blog" className="back-link">
-          ← 返回博客列表
-        </Link>
+        <div className="blog-header-top">
+          <Link href={`/${locale}/blog`} className="back-link">
+            ← {t('blog.backToBlog')}
+          </Link>
+          <LocaleSwitcher currentLocale={locale} />
+        </div>
       </header>
 
       <article className="blog-post">
@@ -104,16 +126,20 @@ export default async function BlogPostPage(props: Props) {
         <div className="post-header-meta">
           {post.publishedDate && (
             <time dateTime={post.publishedDate}>
-              {new Date(post.publishedDate).toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {new Date(post.publishedDate).toLocaleDateString(
+                locale === 'zh' ? 'zh-CN' : 'en-US',
+                {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                },
+              )}
             </time>
           )}
           {typeof post.author === 'object' && post.author && (
             <span className="author">
-              作者: {typeof post.author.email === 'string' ? post.author.email : '未知作者'}
+              {t('blog.author')}:{' '}
+              {typeof post.author.email === 'string' ? post.author.email : t('blog.unknown')}
             </span>
           )}
         </div>

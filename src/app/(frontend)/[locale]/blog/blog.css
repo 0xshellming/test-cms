@@ -9,9 +9,17 @@
   margin-bottom: 60px;
 }
 
+.blog-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 .back-link {
   display: inline-block;
-  margin-bottom: 20px;
   text-decoration: none;
   color: rgb(1000, 1000, 1000);
   opacity: 0.8;
@@ -19,6 +27,14 @@
 
   &:hover {
     opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .blog-header-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 }
 
@@ -113,12 +129,14 @@
 
 .post-meta {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   font-size: 14px;
   color: rgb(150, 150, 150);
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid rgb(40, 40, 40);
+  align-items: center;
 
   time {
     display: block;
@@ -126,6 +144,22 @@
 
   .author {
     display: block;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgb(30, 30, 30);
+    border: 1px solid rgb(50, 50, 50);
+    border-radius: 4px;
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgb(40, 40, 40);
+      border-color: rgb(60, 60, 60);
+    }
   }
 }
 

@@ -5,15 +5,43 @@ import { getPayload } from 'payload'
 import React from 'react'
 
 import config from '@/payload.config'
-import '../styles.css'
 import './blog.css'
+import { Tag } from '@/payload-types'
+import LocaleSwitcher from '@/components/LocaleSwitcher'
+import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
+import { notFound } from 'next/navigation'
 
-export const metadata = {
-  title: '博客',
-  description: '查看所有博客文章',
+type Props = {
+  params: Promise<{ locale: string }>
 }
 
-export default async function BlogPage() {
+export async function generateMetadata(props: Props) {
+  const { locale: localeParam } = await props.params
+  const locale = isValidLocale(localeParam) ? localeParam : 'zh'
+  const t = createTranslator(locale)
+
+  return {
+    title: t('blog.title'),
+    description: t('blog.description'),
+  }
+}
+
+// 生成静态参数
+export async function generateStaticParams() {
+  return [{ locale: 'zh' }, { locale: 'en' }]
+}
+
+export default async function BlogPage(props: Props) {
+  const { locale: localeParam } = await props.params
+
+  // 验证 locale
+  if (!isValidLocale(localeParam)) {
+    notFound()
+  }
+
+  const locale = localeParam as Locale
+  const t = createTranslator(locale)
+
   const _headers = await getHeaders()
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
@@ -29,22 +57,26 @@ export default async function BlogPage() {
     limit: 20,
     depth: 2,
     draft: false,
+    locale: locale,
   })
 
   return (
     <div className="blog-container">
       <header className="blog-header">
-        <Link href="/" className="back-link">
-          ← 返回首页
-        </Link>
-        <h1>博客</h1>
+        <div className="blog-header-top">
+          <Link href={`/${locale}`} className="back-link">
+            ← {t('blog.backToHome')}
+          </Link>
+          <LocaleSwitcher currentLocale={locale} />
+        </div>
+        <h1>{t('blog.title')}</h1>
       </header>
 
       {posts.docs.length === 0 ? (
         <div className="empty-state">
-          <p>暂无发布的文章</p>
+          <p>{t('blog.noArticles')}</p>
           <Link href="/admin" className="admin-link">
-            前往管理后台创建文章
+            {t('blog.goToAdmin')}
           </Link>
         </div>
       ) : (
@@ -57,9 +89,9 @@ export default async function BlogPage() {
 
             return (
               <article key={post.id} className="post-card">
-                <Link href={`/blog/${post.slug}`} className="post-link">
+                <Link href={`/${locale}/blog/${post.slug}`} className="post-link">
                   {featuredImage && typeof featuredImage.url === 'string' && (
-                    <div className="post-image">
+                    <div className="post-image" data-url={featuredImage.url || '-'}>
                       <Image
                         src={featuredImage.url}
                         alt={featuredImage.alt || post.title || ''}
@@ -79,17 +111,33 @@ export default async function BlogPage() {
                     <div className="post-meta">
                       {post.publishedDate && (
                         <time dateTime={post.publishedDate}>
-                          {new Date(post.publishedDate).toLocaleDateString('zh-CN', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
+                          {new Date(post.publishedDate).toLocaleDateString(
+                            locale === 'zh' ? 'zh-CN' : 'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            },
+                          )}
                         </time>
                       )}
                       {typeof post.author === 'object' && post.author && (
                         <span className="author">
-                          {typeof post.author.email === 'string' ? post.author.email : '未知作者'}
+                          {typeof post.author.email === 'string'
+                            ? post.author.email
+                            : t('blog.unknown')}
                         </span>
+                      )}
+                      {post.tags?.map((tag: number | Tag) =>
+                        typeof tag === 'object' ? (
+                          <span key={tag.id} className="tag" data-id={tag.id}>
+                            {tag.name}
+                          </span>
+                        ) : (
+                          <span key={tag} className="tag" data-id={tag}>
+                            {tag}
+                          </span>
+                        ),
                       )}
                     </div>
                   </div>

@@ -1,0 +1,609 @@
+---
+alwaysApply: true
+---
+
+## 项目概述
+
+这是一个使用 Payload CMS 和 Next.js 构建的多语言博客项目，采用 TypeScript 进行类型安全开发。
+
+---
+
+## 📐 架构原则
+
+### 1. 关注点分离
+
+**严格区分 I18n 和 Localization：**
+
+- **I18n (国际化)**: 用于界面文本翻译
+  - 按钮、标签、提示信息、导航文本等
+  - 使用 `src/lib/translations.ts` 翻译系统
+  - 示例：`t('blog.title')`, `t('common.loading')`
+
+- **Localization (本地化)**: 用于内容数据的多语言版本
+  - 文章标题、正文、描述等
+  - 使用 Payload CMS 的 Localization 功能
+  - 示例：`payload.find({ locale: 'zh' })`
+
+**永远不要混淆这两个概念！**
+
+---
+
+## 🌍 国际化 (I18n) 规范
+
+### 翻译系统使用
+
+**✅ 正确做法：**
+
+```typescript
+import { createTranslator, type Locale } from '@/lib/translations'
+
+export default async function Page({ params }: Props) {
+  const { locale } = await params
+  const t = createTranslator(locale)
+  
+  return (
+    <div>
+      <h1>{t('blog.title')}</h1>
+      <p>{t('blog.description')}</p>
+    </div>
+  )
+}
+```
+
+**❌ 错误做法：**
+
+```typescript
+// 不要使用硬编码的三元表达式
+<h1>{locale === 'zh' ? '博客' : 'Blog'}</h1>
+
+// 不要在组件中直接写翻译文本
+<h1>博客</h1>
+```
+
+### 翻译键命名规范
+
+**使用命名空间.功能.描述的格式：**
+
+```typescript
+// ✅ 推荐
+'blog.title'
+'blog.post.readMore'
+'auth.login.button'
+'error.notFound.message'
+'common.loading'
+'common.error'
+
+// ❌ 避免
+'blogTitle'
+'readMoreButton'
+'error1'
+```
+
+### 添加新翻译
+
+**步骤：**
+
+1. 在 `src/lib/translations.ts` 中添加：
+
+```typescript
+export const translations = {
+  zh: {
+    // 按命名空间组织
+    blog: { /* ... */ },
+    common: { /* ... */ },
+    newFeature: {  // 新功能
+      title: '新功能标题',
+      description: '新功能描述',
+    }
+  },
+  en: {
+    blog: { /* ... */ },
+    common: { /* ... */ },
+    newFeature: {
+      title: 'New Feature Title',
+      description: 'New Feature Description',
+    }
+  }
+}
+```
+
+2. TypeScript 会自动更新类型，无需手动维护
+
+3. 在组件中使用：
+
+```typescript
+{t('newFeature.title')}
+```
+
+### 日期和时间本地化
+
+**始终使用动态的 locale：**
+
+```typescript
+// ✅ 正确
+new Date(date).toLocaleDateString(
+  locale === 'zh' ? 'zh-CN' : 'en-US',
+  { year: 'numeric', month: 'long', day: 'numeric' }
+)
+
+// ❌ 错误：硬编码
+new Date(date).toLocaleDateString('zh-CN', { /* ... */ })
+```
+
+---
+
+## 🗺️ 路由规范
+
+### URL 结构
+
+**使用路径前缀，不使用查询参数：**
+
+```typescript
+// ✅ 正确：路径前缀（SEO 友好）
+/zh/blog
+/en/blog
+/zh/blog/my-post
+/en/blog/my-post
+
+// ❌ 错误：查询参数
+/blog?locale=zh
+/blog/my-post?locale=zh
+```
+
+### 创建链接
+
+**始终包含语言前缀：**
+
+```typescript
+// ✅ 正确
+<Link href={`/${locale}/blog`}>博客</Link>
+<Link href={`/${locale}/blog/${post.slug}`}>文章</Link>
+
+// ❌ 错误：缺少语言前缀
+<Link href="/blog">博客</Link>
+```
+
+### 动态路由参数
+
+**始终验证 locale 参数：**
+
+```typescript
+import { isValidLocale, type Locale } from '@/lib/translations'
+import { notFound } from 'next/navigation'
+
+type Props = {
+  params: Promise<{ locale: string }>
+}
+
+export default async function Page(props: Props) {
+  const { locale: localeParam } = await props.params
+  
+  // 验证 locale
+  if (!isValidLocale(localeParam)) {
+    notFound()  // 返回 404
+  }
+  
+  const locale = localeParam as Locale
+  // ... 继续处理
+}
+```
+
+### 生成静态参数
+
+**为所有语言生成静态页面：**
+
+```typescript
+export async function generateStaticParams() {
+  return [
+    { locale: 'zh' },
+    { locale: 'en' },
+  ]
+}
+```
+
+---
+
+## 📦 Payload CMS Localization
+
+### 获取本地化内容
+
+**始终传递 locale 参数：**
+
+```typescript
+const posts = await payload.find({
+  collection: 'posts',
+  locale: locale,  // 'zh' 或 'en'
+  where: { /* ... */ },
+})
+```
+
+### 配置本地化字段
+
+**在 Collection 中标记需要本地化的字段：**
+
+```typescript
+{
+  name: 'title',
+  type: 'text',
+  localized: true,  // 启用本地化
+}
+```
+
+### 元数据本地化
+
+**使用翻译系统生成动态元数据：**
+
+```typescript
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params
+  const t = createTranslator(locale)
+  
+  return {
+    title: t('blog.title'),
+    description: t('blog.description'),
+  }
+}
+```
+
+---
+
+## 🎨 组件开发规范
+
+### Server Components
+
+```typescript
+import { createTranslator, type Locale } from '@/lib/translations'
+
+type Props = {
+  params: Promise<{ locale: string }>
+}
+
+export default async function ServerComponent(props: Props) {
+  const { locale: localeParam } = await props.params
+  const locale = localeParam as Locale
+  const t = createTranslator(locale)
+  
+  return <div>{t('key')}</div>
+}
+```
+
+### Client Components
+
+```typescript
+'use client'
+
+import { usePathname } from 'next/navigation'
+import { createTranslator, type Locale } from '@/lib/translations'
+
+export default function ClientComponent() {
+  const pathname = usePathname()
+  const locale = pathname.split('/')[1] as Locale
+  const t = createTranslator(locale)
+  
+  return <div>{t('key')}</div>
+}
+```
+
+### 语言切换器
+
+**使用路径替换，不使用查询参数：**
+
+```typescript
+const handleLocaleChange = (newLocale: string) => {
+  const segments = pathname.split('/')
+  
+  if (segments[1] === 'zh' || segments[1] === 'en') {
+    segments[1] = newLocale  // 替换语言代码
+  }
+  
+  router.push(segments.join('/'))
+}
+```
+
+---
+
+## ♿ 无障碍性规范
+
+### 语言切换器
+
+**必须包含的 ARIA 属性：**
+
+```typescript
+<button
+  aria-label={locale === 'zh' ? '切换语言' : 'Switch language'}
+  aria-expanded={isOpen}
+  aria-haspopup="true"
+>
+  {/* 内容 */}
+</button>
+
+<div role="menu">
+  <button
+    role="menuitem"
+    aria-current={locale.code === currentLocale ? 'true' : 'false'}
+  >
+    {/* 选项 */}
+  </button>
+</div>
+```
+
+### HTML lang 属性
+
+**在 layout 中设置正确的 lang 属性：**
+
+```typescript
+export default async function LocaleLayout({ params, children }) {
+  const { locale } = await params
+  
+  return (
+    <html lang={locale}>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+---
+
+## 🔍 SEO 最佳实践
+
+### Hreflang 标签
+
+**在 layout 或 metadata 中添加：**
+
+```typescript
+export async function generateMetadata({ params }) {
+  const { locale } = await params
+  
+  return {
+    alternates: {
+      canonical: `https://example.com/${locale}`,
+      languages: {
+        'zh': 'https://example.com/zh',
+        'en': 'https://example.com/en',
+      },
+    },
+  }
+}
+```
+
+### 站点地图
+
+**为每个语言生成独立的 sitemap：**
+
+```
+/zh/sitemap.xml
+/en/sitemap.xml
+```
+
+---
+
+## 🧪 类型安全
+
+### 翻译键类型检查
+
+**系统会自动提供类型检查：**
+
+```typescript
+// ✅ 正确 - TypeScript 知道这个键存在
+t('blog.title')
+
+// ❌ 错误 - TypeScript 会报错
+t('blog.titel')  // 拼写错误
+t('blg.title')   // 命名空间错误
+```
+
+### Locale 类型
+
+**始终使用 Locale 类型：**
+
+```typescript
+import { type Locale } from '@/lib/translations'
+
+const locale: Locale = 'zh'  // ✅ 类型安全
+const locale = 'fr' as Locale  // ❌ 运行时可能出错
+```
+
+---
+
+## 🚀 性能优化
+
+### 静态生成
+
+**尽可能使用静态生成：**
+
+```typescript
+// 生成所有语言版本的静态页面
+export async function generateStaticParams() {
+  return [{ locale: 'zh' }, { locale: 'en' }]
+}
+```
+
+### 增量静态再生
+
+**为动态内容设置 revalidate：**
+
+```typescript
+export const revalidate = 3600  // 每小时重新生成
+```
+
+---
+
+## 📝 代码审查清单
+
+在提交代码前，检查：
+
+- [ ] 所有界面文本都使用翻译函数 `t()`，没有硬编码
+- [ ] 所有链接都包含语言前缀 `/${locale}/path`
+- [ ] 日期/时间使用正确的 locale 格式化
+- [ ] 动态路由验证了 locale 参数
+- [ ] 添加了适当的 ARIA 属性
+- [ ] 新增翻译已添加到所有支持的语言
+- [ ] 翻译键遵循命名规范（命名空间.功能.描述）
+- [ ] 没有混淆 I18n 和 Localization
+- [ ] TypeScript 类型检查通过
+- [ ] 测试了所有支持的语言
+
+---
+
+## 🎯 常见错误和解决方案
+
+### 错误 1: 硬编码翻译文本
+
+```typescript
+// ❌ 错误
+<h1>{locale === 'zh' ? '博客' : 'Blog'}</h1>
+
+// ✅ 正确
+<h1>{t('blog.title')}</h1>
+```
+
+### 错误 2: 缺少语言前缀的链接
+
+```typescript
+// ❌ 错误
+<Link href="/blog">博客</Link>
+
+// ✅ 正确
+<Link href={`/${locale}/blog`}>{t('blog.title')}</Link>
+```
+
+### 错误 3: 未验证 locale 参数
+
+```typescript
+// ❌ 错误
+const locale = params.locale as Locale
+
+// ✅ 正确
+if (!isValidLocale(params.locale)) {
+  notFound()
+}
+const locale = params.locale as Locale
+```
+
+### 错误 4: 日期格式硬编码
+
+```typescript
+// ❌ 错误
+new Date(date).toLocaleDateString('zh-CN')
+
+// ✅ 正确
+new Date(date).toLocaleDateString(
+  locale === 'zh' ? 'zh-CN' : 'en-US'
+)
+```
+
+### 错误 5: 翻译键不一致
+
+```typescript
+// ❌ 错误：不同的命名风格
+t('blogTitle')
+t('blog_description')
+t('Blog-Author')
+
+// ✅ 正确：统一的命名风格
+t('blog.title')
+t('blog.description')
+t('blog.author')
+```
+
+---
+
+## 🌟 添加新语言的步骤
+
+1. **更新翻译文件** (`src/lib/translations.ts`):
+
+```typescript
+export const translations = {
+  zh: { /* ... */ },
+  en: { /* ... */ },
+  ja: {  // 新语言
+    blog: { title: 'ブログ', /* ... */ },
+    common: { loading: '読み込み中...', /* ... */ }
+  }
+}
+
+export type Locale = 'zh' | 'en' | 'ja'
+export const locales: Locale[] = ['zh', 'en', 'ja']
+```
+
+2. **更新语言切换器** (`src/components/LocaleSwitcher.tsx`):
+
+```typescript
+const locales = [
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
+  { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵' },
+]
+```
+
+3. **更新 Payload 配置** (`src/payload.config.ts`):
+
+```typescript
+localization: {
+  locales: [
+    { label: 'English', code: 'en' },
+    { label: '中文', code: 'zh' },
+    { label: '日本語', code: 'ja' },
+  ],
+}
+```
+
+4. **更新中间件** (如果需要特殊的语言检测规则)
+
+5. **测试新语言**:
+   - 访问 `/ja/blog`
+   - 测试语言切换
+   - 验证所有翻译都已添加
+
+---
+
+## 📚 参考文档
+
+- [Next.js Internationalization](https://nextjs.org/docs/app/building-your-application/routing/internationalization)
+- [Payload Localization](https://payloadcms.com/docs/configuration/localization)
+- [Payload I18n](https://payloadcms.com/docs/configuration/i18n)
+- [MDN: Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language)
+- [W3C ARIA](https://www.w3.org/TR/wai-aria/)
+
+---
+
+## 💡 AI 助手指南
+
+当用户请求添加新功能或修改代码时：
+
+1. **检查是否涉及用户界面文本**
+   - 如果是，使用翻译系统，不要硬编码
+
+2. **检查是否创建新链接**
+   - 确保包含 `/${locale}` 前缀
+
+3. **检查是否处理日期/时间**
+   - 使用动态 locale 格式化
+
+4. **检查是否创建新路由**
+   - 验证 locale 参数
+   - 生成静态参数
+
+5. **检查是否添加新翻译**
+   - 为所有支持的语言添加翻译
+   - 遵循命名规范
+
+6. **提醒用户测试**
+   - 测试所有支持的语言
+   - 验证类型安全
+
+---
+
+## ✨ 总结
+
+本项目采用：
+
+- **类型安全的翻译系统**：编译时捕获错误
+- **路径前缀路由**：SEO 友好的 URL 结构
+- **自动语言检测**：基于浏览器偏好
+- **关注点分离**：清晰区分 I18n 和 Localization
+- **完整的无障碍支持**：ARIA 属性和语义化标记
+- **性能优化**：静态生成和 ISR
+
+**遵循这些规范，确保代码质量和一致性！** 🚀
