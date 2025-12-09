@@ -1,5 +1,5 @@
 import React from 'react'
-import './styles.css'
+import '@/app/globals.css'
 import { isValidLocale, type Locale } from '@/lib/translations'
 import { notFound } from 'next/navigation'
 

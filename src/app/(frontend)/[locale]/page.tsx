@@ -1,9 +1,6 @@
-import Link from 'next/link'
-import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
+import { type Locale, isValidLocale } from '@/lib/translations'
 import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
-import LocaleSwitcher from '@/components/LocaleSwitcher'
-import { PushNotificationManager, InstallPrompt } from '@/components/pwa'
+import { HomePageContent } from '@/components/home/HomePageContent'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -25,80 +22,10 @@ export default async function HomePage(props: Props) {
   }
 
   const locale = localeParam as Locale
-  const t = createTranslator(locale)
 
   return (
-    <div className="blog-container">
-      <header className="blog-header">
-        <div className="blog-header-top">
-          <h1>{t('home.welcome')}</h1>
-          <Suspense fallback={<div style={{ width: '120px', height: '40px' }} />}>
-            <LocaleSwitcher currentLocale={locale} />
-          </Suspense>
-        </div>
-      </header>
-
-      <div style={{ padding: '40px 0' }}>
-        <h2>{t('home.title')}</h2>
-        <p style={{ marginTop: '20px', fontSize: '18px', lineHeight: '1.6' }}>
-          {t('home.description')}
-        </p>
-
-        <div style={{ marginTop: '40px' }}>
-          <Link
-            href={`/${locale}/blog`}
-            style={{
-              display: 'inline-block',
-              padding: '12px 24px',
-              background: 'rgb(100, 100, 100)',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '500',
-              transition: 'background 0.2s',
-            }}
-          >
-            {t('blog.title')} →
-          </Link>
-
-          <Link
-            href="/admin"
-            style={{
-              display: 'inline-block',
-              marginLeft: '16px',
-              padding: '12px 24px',
-              background: 'transparent',
-              color: 'rgb(150, 150, 150)',
-              textDecoration: 'none',
-              border: '1px solid rgb(100, 100, 100)',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-            }}
-          >
-            {t('home.admin')} →
-          </Link>
-        </div>
-
-        {/* PWA 功能区域 */}
-        <div
-          style={{
-            marginTop: '60px',
-            padding: '30px',
-            border: '1px solid rgb(100, 100, 100)',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(100, 100, 100, 0.05)',
-          }}
-        >
-          <h2 style={{ marginBottom: '30px', fontSize: '24px' }}>PWA 功能</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-            <InstallPrompt locale={locale} />
-            <PushNotificationManager locale={locale} />
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-white">
+      <HomePageContent locale={locale} />
     </div>
   )
 }

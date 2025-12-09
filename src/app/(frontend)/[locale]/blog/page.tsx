@@ -2,7 +2,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
 
-import './blog.css'
 import { Tag } from '@/payload-types'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
 import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
