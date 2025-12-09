@@ -1,12 +1,16 @@
 'use client'
 
 import { createTranslator, type Locale } from '@/lib/translations'
-import { HomeHeader } from './HomeHeader'
 import { BookRecommendations } from './BookRecommendations'
-import { CategoryButtons } from './CategoryButtons'
-import { MicrolearningCards } from './MicrolearningCards'
-import { FloatingActions } from './FloatingActions'
 import { BottomNavigation } from './BottomNavigation'
+import { CardWithDrawerExample } from './CardWithDrawerExample'
+import { CategoryButtons } from './CategoryButtons'
+import { FloatingActions } from './FloatingActions'
+import { HomeHeader } from './HomeHeader'
+import { MicrolearningCards } from './MicrolearningCards'
+import { FirstForToday } from './FirstForToday'
+import { FreeDailyRead } from './FreeDailyRead'
+import { CollectionCards } from './CollectionCards'
 
 type Props = {
   locale: Locale
@@ -51,19 +55,62 @@ export function HomePageContent({ locale }: Props) {
   ]
 
   const microlearningItems = [
-    { id: '1', title: 'Never Enough', icon: '💰', color: 'bg-yellow-100' },
-    { id: '2', title: 'SCRUM', tags: ['To Do', 'Doing', 'Done'], color: 'bg-blue-100' },
-    { id: '3', title: 'Keep It', icon: '💡', color: 'bg-green-100' },
-    { id: '4', title: 'Crying in H Mart', icon: '📖', color: 'bg-pink-100' },
+    {
+      id: '1',
+      title: 'The Practice',
+      icon: '🎯',
+      color: 'bg-gradient-to-br from-purple-400 to-pink-400',
+    },
+    {
+      id: '2',
+      title: 'The TB12 Method',
+      icon: '👕',
+      color: 'bg-gradient-to-br from-yellow-300 to-orange-300',
+    },
+    {
+      id: '3',
+      title: 'The Obesity Code',
+      icon: '📊',
+      color: 'bg-gradient-to-br from-orange-400 to-red-400',
+    },
+    {
+      id: '4',
+      title: 'More Than This',
+      icon: '❤️',
+      color: 'bg-gradient-to-br from-purple-500 to-pink-500',
+    },
+  ]
+
+  const collectionItems = [
+    {
+      id: '1',
+      title: 'How to Talk to Succeed',
+      subtitle: 'Speak Like a CEO and Win Every Interaction',
+      icon: '💬',
+      bgColor: 'bg-gradient-to-br from-orange-500 to-orange-600',
+    },
+    {
+      id: '2',
+      title: 'Think Like a CEO',
+      subtitle: 'Plan, Achieve, Succeed',
+      icon: '✅',
+      bgColor: 'bg-gradient-to-br from-gray-600 to-gray-700',
+    },
   ]
 
   return (
-    <div className="flex flex-col min-h-screen pb-20">
+    <div className="flex flex-col min-h-screen pb-20 bg-gray-50">
       {/* 头部 */}
       <HomeHeader locale={locale} />
 
       {/* 主内容区域 */}
-      <main className="flex-1 px-4 space-y-8 pb-4">
+      <main className="flex-1 px-4 space-y-6 pb-4 pt-4">
+        {/* 今日首要任务 */}
+        <FirstForToday locale={locale} />
+
+        {/* 每日免费阅读推广 */}
+        <FreeDailyRead locale={locale} />
+
         {/* 你可能也喜欢 */}
         <section>
           <h2 className="text-2xl font-bold mb-1">{t('home.youMightAlsoLike')}</h2>
@@ -83,10 +130,23 @@ export function HomePageContent({ locale }: Props) {
           <p className="text-sm text-gray-600 mb-4">{t('home.dailyMicrolearningSubtitle')}</p>
           <MicrolearningCards items={microlearningItems} />
         </section>
+
+        {/* 更多助你成功的职业建议 */}
+        <section>
+          <h2 className="text-2xl font-bold mb-1">{t('home.moreToHaveSuccessfulCareer')}</h2>
+          <p className="text-sm text-gray-600 mb-4">{t('home.youMightLikeForGoal')}</p>
+          <CardWithDrawerExample locale={locale} />
+        </section>
+
+        {/* 为你定制的合集 */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4">{t('home.collectionsMadeForYou')}</h2>
+          <CollectionCards items={collectionItems} />
+        </section>
       </main>
 
       {/* 浮动操作按钮 */}
-      <FloatingActions locale={locale} />
+      {/* <FloatingActions locale={locale} /> */}
 
       {/* 底部导航栏 */}
       <BottomNavigation locale={locale} />

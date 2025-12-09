@@ -22,21 +22,29 @@ export function MicrolearningCards({ items }: Props) {
           <div
             key={item.id}
             className={cn(
-              'flex-shrink-0 w-48 h-32 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col justify-between',
+              'flex-shrink-0 w-48 h-36 rounded-2xl shadow-md border border-gray-200 p-5 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-all active:scale-[0.98] relative overflow-hidden',
               item.color,
             )}
           >
-            {item.icon && <div className="text-3xl mb-2">{item.icon}</div>}
-            {item.tags && (
-              <div className="flex flex-wrap gap-1 mb-2">
-                {item.tags.map((tag, idx) => (
-                  <span key={idx} className="text-xs bg-white/50 px-2 py-0.5 rounded">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-            <h3 className="font-semibold text-sm line-clamp-2">{item.title}</h3>
+            {/* 装饰性背景 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col h-full">
+              {item.icon && <div className="text-4xl mb-2">{item.icon}</div>}
+              {item.tags && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {item.tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs bg-white/70 backdrop-blur-sm px-2 py-1 rounded-md font-medium"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <h3 className="font-bold text-sm line-clamp-2 text-gray-900 mt-auto">{item.title}</h3>
+            </div>
           </div>
         ))}
       </div>

@@ -21,12 +21,14 @@ export function CategoryButtons({ items }: Props) {
           <button
             key={item.id}
             className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 flex-shrink-0 hover:shadow-md transition-shadow',
+              'flex items-center gap-2 px-5 py-3 rounded-full border-2 border-gray-200 flex-shrink-0 hover:shadow-md hover:border-blue-300 transition-all active:scale-95',
               item.color,
             )}
           >
-            <span className="text-xl">{item.icon}</span>
-            <span className="font-medium text-sm whitespace-nowrap">{item.name}</span>
+            <span className="text-2xl">{item.icon}</span>
+            <span className="font-semibold text-sm whitespace-nowrap text-gray-900">
+              {item.name}
+            </span>
           </button>
         ))}
       </div>
