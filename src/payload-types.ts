@@ -291,23 +291,29 @@ export interface BookSummary {
   coverUrl?: string | null;
   aboutAuthor?: string | null;
   /**
-   * 书籍的简短摘要
+   * 你会获得, Markdown 格式, Bullet List 格式
    */
-  summary?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  summary: string;
+  /**
+   * 书籍的关键要点列表
+   */
+  keypoints?:
+    | {
+        /**
+         * 要点的序号
+         */
+        index: number;
+        /**
+         * 要点的标题
+         */
+        title: string;
+        /**
+         * 要点的详细内容
+         */
+        content: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * 详细的章节内容总结
    */
@@ -315,18 +321,6 @@ export interface BookSummary {
   review?: string | null;
   faq?: string | null;
   summaryReviews?: string | null;
-  /**
-   * 完整的书籍数据 JSON，用于数据导入和备份
-   */
-  rawContent?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
   publishedDate?: string | null;
   seo?: {
     metaTitle?: string | null;
@@ -804,11 +798,18 @@ export interface BookSummariesSelect<T extends boolean = true> {
   coverUrl?: T;
   aboutAuthor?: T;
   summary?: T;
+  keypoints?:
+    | T
+    | {
+        index?: T;
+        title?: T;
+        content?: T;
+        id?: T;
+      };
   chapterSummary?: T;
   review?: T;
   faq?: T;
   summaryReviews?: T;
-  rawContent?: T;
   publishedDate?: T;
   seo?:
     | T

@@ -116,12 +116,54 @@ export const BookSummaries: CollectionConfig = {
     // 总结内容（短版）
     {
       name: 'summary',
-      type: 'richText',
+      type: 'textarea',
       localized: true,
+      required: true,
       label: '书籍摘要',
       admin: {
-        description: '书籍的简短摘要',
+        description: '你会获得, Markdown 格式, Bullet List 格式',
       },
+    },
+
+    // 关键要点
+    {
+      name: 'keypoints',
+      type: 'array',
+      label: '关键要点',
+      admin: {
+        description: '书籍的关键要点列表',
+      },
+      fields: [
+        {
+          name: 'index',
+          type: 'number',
+          required: true,
+          label: '序号',
+          admin: {
+            description: '要点的序号',
+          },
+        },
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+          localized: true,
+          label: '标题',
+          admin: {
+            description: '要点的标题',
+          },
+        },
+        {
+          name: 'content',
+          type: 'textarea',
+          required: true,
+          localized: true,
+          label: '内容',
+          admin: {
+            description: '要点的详细内容',
+          },
+        },
+      ],
     },
 
     // 详细章节总结
@@ -158,19 +200,6 @@ export const BookSummaries: CollectionConfig = {
       localized: true,
       label: '读者评论摘要',
     },
-
-    // 完整内容（JSON格式存储）
-    {
-      name: 'rawContent',
-      type: 'json',
-      localized: true,
-      label: '原始内容（JSON）',
-      admin: {
-        description: '完整的书籍数据 JSON，用于数据导入和备份',
-      },
-    },
-
-    // 注：合集关联已移至 Collections 模型的 items 字段（多态关系）
 
     // 发布日期
     {

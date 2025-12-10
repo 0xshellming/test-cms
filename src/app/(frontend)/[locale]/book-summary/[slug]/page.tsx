@@ -1,11 +1,10 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
 import LocaleSwitcher from '@/components/LocaleSwitcher'
+import { StaticMarkdown } from '@/components/markdown-renderer/markdown-renderer'
 import { getCachedBookSummary, getCachedBookSummarySlugs } from '@/lib/cache'
-import { getAbsoluteImageUrl } from '@/lib/image-url'
 import { createTranslator, isValidLocale, type Locale } from '@/lib/translations'
 
 type Props = {
@@ -106,10 +105,6 @@ export default async function BlogPostPage(props: Props) {
   const featuredImage =
     typeof bookSummary.cover === 'object' && bookSummary.cover ? bookSummary.cover : null
 
-  const rawContent: any = bookSummary.rawContent || {}
-  // 安全地转换内容
-  const contentHtml = rawContent['chapter-summary']
-  const aboutAuthor = rawContent['aboutAuthor']
   // try {
   //   if (typeof bookSummary.summary === 'object' && bookSummary.summary) {
   //     contentHtml = convertLexicalToHTML({ data: bookSummary.summary })
@@ -143,87 +138,15 @@ export default async function BlogPostPage(props: Props) {
         </div>
       </header>
 
-      <article className="max-w-4xl mx-auto px-4 py-8">
-        {/* 封面图 */}
-        {featuredImage && typeof featuredImage.url === 'string' && (
-          <div className="mb-8 rounded-2xl overflow-hidden shadow-lg">
-            <Image
-              src={getAbsoluteImageUrl(featuredImage.url, baseUrl)}
-              alt={featuredImage.alt || postTitle}
-              width={1200}
-              height={600}
-              className="w-full h-auto"
-              style={{
-                objectFit: 'cover',
-              }}
-            />
+      <article className="prose prose-lg max-w-none mx-auto px-4">
+        {bookSummary.keypoints?.map((keypoint) => (
+          <div key={keypoint.index}>
+            <h3>
+              {keypoint.index}. {keypoint.title}
+            </h3>
+            <StaticMarkdown content={keypoint.content} />
           </div>
-        )}
-
-        {/* 标题 */}
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-          {postTitle}
-        </h1>
-
-        {/* 元信息 */}
-        <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-600">
-          {bookSummary.publishedDate && typeof bookSummary.publishedDate === 'string' && (
-            <time dateTime={bookSummary.publishedDate} className="flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              {new Date(bookSummary.publishedDate).toLocaleDateString(
-                locale === 'zh' ? 'zh-CN' : 'en-US',
-                {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                },
-              )}
-            </time>
-          )}
-          <span className="flex items-center gap-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            15 {t('bookSummary.minutes')}
-          </span>
-        </div>
-
-        {/* 摘要 */}
-        {bookSummary.desc && typeof bookSummary.desc === 'string' && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
-            <p className="text-lg text-gray-700 leading-relaxed">{bookSummary.desc}</p>
-          </div>
-        )}
-
-        {/* 正文内容 */}
-        {contentHtml && (
-          <div className="prose prose-lg max-w-none">
-            <div
-              className="text-gray-800 leading-relaxed whitespace-pre-wrap"
-              dangerouslySetInnerHTML={{ __html: contentHtml }}
-            />
-          </div>
-        )}
-        {aboutAuthor && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
-            <div
-              className="text-gray-800 leading-relaxed whitespace-pre-wrap"
-              dangerouslySetInnerHTML={{ __html: aboutAuthor }}
-            />
-          </div>
-        )}
+        ))}
       </article>
     </div>
   )
