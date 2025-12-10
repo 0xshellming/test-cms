@@ -133,3 +133,4 @@ color: 'bg-purple-500'                                    // 单色背景
 - **Styling**: Tailwind CSS
 - **Animation**: vaul 内置动画
 
+

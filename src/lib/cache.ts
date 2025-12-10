@@ -46,12 +46,12 @@ export async function getCachedPosts(locale: Locale, limit = 20) {
  * 注意：在 Cloudflare Workers 环境中，直接查询数据库
  * 页面级别的缓存通过 Next.js ISR (revalidate) 实现
  */
-export async function getCachedPost(slug: string, locale: Locale) {
+export async function getCachedBookSummary(slug: string, locale: Locale) {
   try {
     const payload = await getCachedPayload()
 
-    const posts = await payload.find({
-      collection: 'posts',
+    const bookSummaries = await payload.find({
+      collection: 'book-summaries',
       where: {
         and: [
           {
@@ -72,7 +72,7 @@ export async function getCachedPost(slug: string, locale: Locale) {
       locale,
     })
 
-    return posts.docs[0] || null
+    return bookSummaries.docs[0] || null
   } catch (error) {
     // 记录错误并重新抛出，让调用者处理
     console.error(`Error fetching post ${slug} for locale ${locale}:`, error)
@@ -84,12 +84,12 @@ export async function getCachedPost(slug: string, locale: Locale) {
  * 获取所有已发布的博客文章 slug（用于静态生成）
  * 注意：在构建时调用，如果失败则返回空数组，让页面在运行时生成
  */
-export async function getCachedPostSlugs(locale: Locale) {
+export async function getCachedBookSummarySlugs(locale: Locale) {
   try {
     const payload = await getCachedPayload()
 
-    const posts = await payload.find({
-      collection: 'posts',
+    const bookSummaries = await payload.find({
+      collection: 'book-summaries',
       where: {
         _status: {
           equals: 'published',
@@ -104,8 +104,8 @@ export async function getCachedPostSlugs(locale: Locale) {
       locale,
     })
 
-    return posts.docs
-      .map((post) => post.slug)
+    return bookSummaries.docs
+      .map((bookSummary) => bookSummary.slug)
       .filter((slug): slug is string => typeof slug === 'string')
   } catch (error) {
     // 在构建时如果无法获取数据，返回空数组

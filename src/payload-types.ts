@@ -72,6 +72,9 @@ export interface Config {
     posts: Post;
     categories: Category;
     tags: Tag;
+    'book-summaries': BookSummary;
+    'youtube-summaries': YoutubeSummary;
+    collections: Collection;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +87,9 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
+    'book-summaries': BookSummariesSelect<false> | BookSummariesSelect<true>;
+    'youtube-summaries': YoutubeSummariesSelect<false> | YoutubeSummariesSelect<true>;
+    collections: CollectionsSelect<false> | CollectionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -244,6 +250,358 @@ export interface Tag {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "book-summaries".
+ */
+export interface BookSummary {
+  id: number;
+  /**
+   * URL 友好的书籍标识符（例如：make-your-bed）
+   */
+  slug: string;
+  /**
+   * 书籍标题
+   */
+  title: string;
+  /**
+   * 作者姓名
+   */
+  author: string;
+  /**
+   * 简短描述，用于列表页和 SEO
+   */
+  desc?: string | null;
+  metadata?: {
+    pageCount?: string | null;
+    ratingValue?: string | null;
+    ratingsCount?: string | null;
+    tags?:
+      | {
+          tag?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * 书籍封面图片，推荐尺寸：360px 宽
+   */
+  cover?: (number | null) | Media;
+  /**
+   * 如果没有上传封面，可以使用外部 URL
+   */
+  coverUrl?: string | null;
+  aboutAuthor?: string | null;
+  /**
+   * 书籍的简短摘要
+   */
+  summary?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * 详细的章节内容总结
+   */
+  chapterSummary?: string | null;
+  review?: string | null;
+  faq?: string | null;
+  summaryReviews?: string | null;
+  /**
+   * 完整的书籍数据 JSON，用于数据导入和备份
+   */
+  rawContent?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  publishedDate?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    keywords?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "youtube-summaries".
+ */
+export interface YoutubeSummary {
+  id: number;
+  /**
+   * URL 友好的视频标识符
+   */
+  slug: string;
+  /**
+   * 视频总结的语言
+   */
+  lang: 'en' | 'zh';
+  /**
+   * 视频标题
+   */
+  title: string;
+  /**
+   * 简短描述
+   */
+  desc?: string | null;
+  videoInfo: {
+    /**
+     * 例如：dQw4w9WgXcQ
+     */
+    videoId: string;
+    /**
+     * 完整的 YouTube 视频链接
+     */
+    videoUrl?: string | null;
+    channel?: string | null;
+    channelUrl?: string | null;
+    /**
+     * 例如：15:30
+     */
+    duration?: string | null;
+    viewCount?: string | null;
+    likeCount?: string | null;
+    publishDate?: string | null;
+  };
+  thumbnail?: (number | null) | Media;
+  /**
+   * YouTube 视频缩略图 URL
+   */
+  thumbnailUrl?: string | null;
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 视频内容的简短摘要
+   */
+  summary: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * 视频的关键要点和重点内容
+   */
+  keyPoints?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * 按时间戳组织的笔记
+   */
+  timestampNotes?:
+    | {
+        /**
+         * 例如：05:30
+         */
+        timestamp: string;
+        note: string;
+        id?: string | null;
+      }[]
+    | null;
+  review?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * 完整的视频数据 JSON，用于数据导入和备份
+   */
+  rawContent?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  categories?: (number | Category)[] | null;
+  publishedDate?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections".
+ */
+export interface Collection {
+  id: number;
+  /**
+   * URL 友好的合集标识符（例如：leadership-books）
+   */
+  slug: string;
+  /**
+   * 合集标题
+   */
+  title: string;
+  /**
+   * 合集描述
+   */
+  desc: string;
+  /**
+   * 副标题（可选）
+   */
+  subtitle?: string | null;
+  /**
+   * 合集包含的主要内容类型
+   */
+  collectionType: 'mixed' | 'books' | 'youtube' | 'posts' | 'courses';
+  /**
+   * 合集的封面图片
+   */
+  image?: (number | null) | Media;
+  /**
+   * 如果没有上传图片，可以使用外部 URL
+   */
+  imageUrl?: string | null;
+  displaySettings?: {
+    /**
+     * 用于显示的 Emoji 图标（例如：💬、✅、🏆）
+     */
+    icon?: string | null;
+    bgColor?:
+      | (
+          | 'bg-gradient-to-br from-orange-500 to-orange-600'
+          | 'bg-gradient-to-br from-gray-600 to-gray-700'
+          | 'bg-gradient-to-br from-blue-500 to-blue-600'
+          | 'bg-gradient-to-br from-purple-500 to-purple-600'
+          | 'bg-gradient-to-br from-green-500 to-green-600'
+          | 'bg-gradient-to-br from-red-500 to-red-600'
+          | 'bg-gradient-to-br from-pink-500 to-pink-600'
+          | 'bg-gradient-to-br from-indigo-500 to-indigo-600'
+          | 'bg-gradient-to-br from-yellow-500 to-yellow-600'
+          | 'bg-gradient-to-br from-cyan-500 to-cyan-600'
+        )
+      | null;
+    /**
+     * 如需其他颜色，输入 Tailwind CSS 类名
+     */
+    customBgColor?: string | null;
+  };
+  /**
+   * 添加各种类型的内容到合集中
+   */
+  items?:
+    | {
+        item:
+          | {
+              relationTo: 'book-summaries';
+              value: number | BookSummary;
+            }
+          | {
+              relationTo: 'youtube-summaries';
+              value: number | YoutubeSummary;
+            }
+          | {
+              relationTo: 'posts';
+              value: number | Post;
+            };
+        /**
+         * 数字越小越靠前
+         */
+        sortOrder?: number | null;
+        /**
+         * 标记为精选项目
+         */
+        featured?: boolean | null;
+        /**
+         * 关于这个项目在合集中的说明
+         */
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 合集中的项目数量（自动计算）
+   */
+  itemCount?: number | null;
+  /**
+   * 数字越小越靠前显示
+   */
+  sortOrder?: number | null;
+  displayLocations?: {
+    showOnHomepage?: boolean | null;
+    showInExplore?: boolean | null;
+    /**
+     * 标记为精选合集，会在首页突出显示
+     */
+    featured?: boolean | null;
+  };
+  /**
+   * 合集的统计数据
+   */
+  stats?: {
+    viewCount?: number | null;
+    likeCount?: number | null;
+    bookmarkCount?: number | null;
+  };
+  publishedDate?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    keywords?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -285,6 +643,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tags';
         value: number | Tag;
+      } | null)
+    | ({
+        relationTo: 'book-summaries';
+        value: number | BookSummary;
+      } | null)
+    | ({
+        relationTo: 'youtube-summaries';
+        value: number | YoutubeSummary;
+      } | null)
+    | ({
+        relationTo: 'collections';
+        value: number | Collection;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -407,6 +777,157 @@ export interface TagsSelect<T extends boolean = true> {
   description?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "book-summaries_select".
+ */
+export interface BookSummariesSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  author?: T;
+  desc?: T;
+  metadata?:
+    | T
+    | {
+        pageCount?: T;
+        ratingValue?: T;
+        ratingsCount?: T;
+        tags?:
+          | T
+          | {
+              tag?: T;
+              id?: T;
+            };
+      };
+  cover?: T;
+  coverUrl?: T;
+  aboutAuthor?: T;
+  summary?: T;
+  chapterSummary?: T;
+  review?: T;
+  faq?: T;
+  summaryReviews?: T;
+  rawContent?: T;
+  publishedDate?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        keywords?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "youtube-summaries_select".
+ */
+export interface YoutubeSummariesSelect<T extends boolean = true> {
+  slug?: T;
+  lang?: T;
+  title?: T;
+  desc?: T;
+  videoInfo?:
+    | T
+    | {
+        videoId?: T;
+        videoUrl?: T;
+        channel?: T;
+        channelUrl?: T;
+        duration?: T;
+        viewCount?: T;
+        likeCount?: T;
+        publishDate?: T;
+      };
+  thumbnail?: T;
+  thumbnailUrl?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  summary?: T;
+  keyPoints?: T;
+  timestampNotes?:
+    | T
+    | {
+        timestamp?: T;
+        note?: T;
+        id?: T;
+      };
+  review?: T;
+  rawContent?: T;
+  categories?: T;
+  publishedDate?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_select".
+ */
+export interface CollectionsSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  desc?: T;
+  subtitle?: T;
+  collectionType?: T;
+  image?: T;
+  imageUrl?: T;
+  displaySettings?:
+    | T
+    | {
+        icon?: T;
+        bgColor?: T;
+        customBgColor?: T;
+      };
+  items?:
+    | T
+    | {
+        item?: T;
+        sortOrder?: T;
+        featured?: T;
+        note?: T;
+        id?: T;
+      };
+  itemCount?: T;
+  sortOrder?: T;
+  displayLocations?:
+    | T
+    | {
+        showOnHomepage?: T;
+        showInExplore?: T;
+        featured?: T;
+      };
+  stats?:
+    | T
+    | {
+        viewCount?: T;
+        likeCount?: T;
+        bookmarkCount?: T;
+      };
+  publishedDate?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        keywords?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

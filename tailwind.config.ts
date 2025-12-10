@@ -7,6 +7,30 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    // 合集背景颜色渐变类（动态从 CMS 获取，需要 safelist）
+    'bg-gradient-to-br',
+    'from-orange-500',
+    'to-orange-600',
+    'from-gray-600',
+    'to-gray-700',
+    'from-blue-500',
+    'to-blue-600',
+    'from-purple-500',
+    'to-purple-600',
+    'from-green-500',
+    'to-green-600',
+    'from-red-500',
+    'to-red-600',
+    'from-pink-500',
+    'to-pink-600',
+    'from-indigo-500',
+    'to-indigo-600',
+    'from-yellow-500',
+    'to-yellow-600',
+    'from-cyan-500',
+    'to-cyan-600',
+  ],
   theme: {
     extend: {
       borderRadius: {
@@ -55,4 +79,3 @@ const config: Config = {
 }
 
 export default config
-

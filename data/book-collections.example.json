@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "leadership-essentials",
+    "title": "Leadership Essentials",
+    "desc": "Master the art of leadership with these essential reads",
+    "image": "https://example.com/leadership-collection.jpg",
+    "icon": "🏆",
+    "bgColor": "bg-gradient-to-br from-purple-500 to-purple-600"
+  },
+  {
+    "slug": "productivity-masters",
+    "title": "Productivity Masters",
+    "desc": "Learn from the best on how to get more done",
+    "image": "https://example.com/productivity-collection.jpg",
+    "icon": "⚡",
+    "bgColor": "bg-gradient-to-br from-orange-500 to-orange-600"
+  }
+]

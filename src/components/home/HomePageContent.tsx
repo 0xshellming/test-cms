@@ -1,102 +1,75 @@
 'use client'
 
 import { createTranslator, type Locale } from '@/lib/translations'
+import { BookSummary } from '@/payload-types'
 import { BookRecommendations } from './BookRecommendations'
 import { BottomNavigation } from './BottomNavigation'
 import { CardWithDrawerExample } from './CardWithDrawerExample'
 import { CategoryButtons } from './CategoryButtons'
-import { FloatingActions } from './FloatingActions'
+import { CollectionCards } from './CollectionCards'
+import { FreeDailyRead } from './FreeDailyRead'
 import { HomeHeader } from './HomeHeader'
 import { MicrolearningCards } from './MicrolearningCards'
-import { FirstForToday } from './FirstForToday'
-import { FreeDailyRead } from './FreeDailyRead'
-import { CollectionCards } from './CollectionCards'
 
 type Props = {
   locale: Locale
+  collections?: any[]
+  bookRecommendations?: BookSummary[]
+  categories?: any[]
 }
 
-export function HomePageContent({ locale }: Props) {
+export function HomePageContent({
+  locale,
+  collections = [],
+  bookRecommendations = [],
+  categories = [],
+}: Props) {
   const t = createTranslator(locale)
 
-  // 模拟数据 - 实际应该从 Payload CMS 获取
-  const bookRecommendations = [
-    {
-      id: '1',
-      title: 'STEAL Like an Artist',
-      description: '10 things nobody told you about being creative',
-      author: 'Austin Kleon',
-      coverColor: 'bg-gradient-to-br from-pink-500 to-rose-600',
-      coverIcon: '✋',
-    },
-    {
-      id: '2',
-      title: 'THE EDUCATION OF MILLIONAIRES',
-      description: "Everything you won't learn in college about how to be successful",
-      author: 'Michael Ellsberg',
-      coverColor: 'bg-gradient-to-br from-red-500 to-orange-600',
-      coverIcon: '🦁',
-    },
-    {
-      id: '3',
-      title: 'Unlock Me',
-      description: 'A guide to personal growth',
-      author: 'Kevin Ho',
-      coverColor: 'bg-gradient-to-br from-blue-600 to-indigo-700',
-      coverIcon: '🔓',
-    },
-  ]
+  // 将 CMS 数据转换为组件需要的格式
+  const formattedBookRecommendations = bookRecommendations.slice(0, 6).map((book: BookSummary) => ({
+    id: book.id,
+    locale,
+    title: book.title,
+    description: book.desc || '',
+    author: book.author || '',
+    coverUrl: book.coverUrl || '',
+    coverColor: 'bg-gradient-to-br from-blue-600 to-indigo-700',
+    coverIcon: '📚',
+    slug: book.slug,
+  }))
 
-  const categories = [
-    { id: '1', name: 'Leadership', icon: '🏆', color: 'bg-purple-100' },
-    { id: '2', name: 'Business & Career', icon: '🔑', color: 'bg-orange-100' },
-    { id: '3', name: 'Productivity', icon: '⚡', color: 'bg-yellow-100' },
-    { id: '4', name: 'Psychology', icon: '🧠', color: 'bg-green-100' },
-  ]
+  const formattedCategories = categories.slice(0, 8).map((category) => ({
+    id: category.id,
+    name: category.name,
+    icon: '📖',
+    color: 'bg-blue-100',
+    slug: category.slug,
+  }))
 
-  const microlearningItems = [
-    {
-      id: '1',
-      title: 'The Practice',
-      icon: '🎯',
-      color: 'bg-gradient-to-br from-purple-500 to-pink-600',
-    },
-    {
-      id: '2',
-      title: 'The TB12 Method',
-      icon: '👕',
-      color: 'bg-gradient-to-br from-yellow-500 to-orange-600',
-    },
-    {
-      id: '3',
-      title: 'The Obesity Code',
-      icon: '📊',
-      color: 'bg-gradient-to-br from-orange-500 to-red-600',
-    },
-    {
-      id: '4',
-      title: 'More Than This',
-      icon: '❤️',
-      color: 'bg-gradient-to-br from-rose-500 to-pink-600',
-    },
-  ]
+  // 为微学习课程使用部分书籍数据
+  const microlearningItems = bookRecommendations.slice(0, 4).map((book) => ({
+    id: book.id,
+    title: book.title,
+    icon: '📚',
+    color: 'bg-gradient-to-br from-purple-500 to-pink-600',
+    slug: book.slug,
+  }))
 
-  const collectionItems = [
-    {
-      id: '1',
-      title: 'How to Talk to Succeed',
-      subtitle: 'Speak Like a CEO and Win Every Interaction',
-      icon: '💬',
-      bgColor: 'bg-gradient-to-br from-orange-500 to-orange-600',
-    },
-    {
-      id: '2',
-      title: 'Think Like a CEO',
-      subtitle: 'Plan, Achieve, Succeed',
-      icon: '✅',
-      bgColor: 'bg-gradient-to-br from-gray-600 to-gray-700',
-    },
-  ]
+  // 转换合集数据
+  const collectionItems = collections.map((collection) => ({
+    id: collection.id,
+    locale: collection.locale,
+    slug: collection.slug,
+    title: collection.title,
+    subtitle: collection.desc,
+    icon: collection.displaySettings?.icon || '📦',
+    bgColor:
+      collection.displaySettings?.customBgColor ||
+      collection.displaySettings?.bgColor ||
+      'bg-gradient-to-br from-blue-500 to-blue-600',
+    itemCount: collection.itemCount || 0,
+  }))
 
   return (
     <div className="flex flex-col min-h-screen pb-20 bg-gray-50">
@@ -112,37 +85,47 @@ export function HomePageContent({ locale }: Props) {
         <FreeDailyRead locale={locale} />
 
         {/* 你可能也喜欢 */}
-        <section>
-          <h2 className="text-2xl font-bold mb-1">{t('home.youMightAlsoLike')}</h2>
-          <p className="text-sm text-gray-600 mb-4">{t('home.youMightAlsoLikeSubtitle')}</p>
-          <BookRecommendations items={bookRecommendations} />
-        </section>
+        {formattedBookRecommendations.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold mb-1">{t('home.youMightAlsoLike')}</h2>
+            <p className="text-sm text-gray-600 mb-4">{t('home.youMightAlsoLikeSubtitle')}</p>
+            <BookRecommendations items={formattedBookRecommendations as any} />
+          </section>
+        )}
 
         {/* 你感兴趣的类别 */}
-        <section>
-          <h2 className="text-2xl font-bold mb-4">{t('home.categoriesInterested')}</h2>
-          <CategoryButtons items={categories} />
-        </section>
+        {formattedCategories.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold mb-4">{t('home.categoriesInterested')}</h2>
+            <CategoryButtons items={formattedCategories} />
+          </section>
+        )}
 
         {/* 每日微学习课程 */}
-        <section>
-          <h2 className="text-2xl font-bold mb-1">{t('home.dailyMicrolearning')}</h2>
-          <p className="text-sm text-gray-600 mb-4">{t('home.dailyMicrolearningSubtitle')}</p>
-          <MicrolearningCards items={microlearningItems} />
-        </section>
+        {microlearningItems.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold mb-1">{t('home.dailyMicrolearning')}</h2>
+            <p className="text-sm text-gray-600 mb-4">{t('home.dailyMicrolearningSubtitle')}</p>
+            <MicrolearningCards items={microlearningItems as any} />
+          </section>
+        )}
 
         {/* 更多助你成功的职业建议 */}
-        <section>
-          <h2 className="text-2xl font-bold mb-1">{t('home.moreToHaveSuccessfulCareer')}</h2>
-          <p className="text-sm text-gray-600 mb-4">{t('home.youMightLikeForGoal')}</p>
-          <CardWithDrawerExample locale={locale} />
-        </section>
+        {formattedBookRecommendations.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold mb-1">{t('home.moreToHaveSuccessfulCareer')}</h2>
+            <p className="text-sm text-gray-600 mb-4">{t('home.youMightLikeForGoal')}</p>
+            <CardWithDrawerExample locale={locale} />
+          </section>
+        )}
 
         {/* 为你定制的合集 */}
-        <section>
-          <h2 className="text-2xl font-bold mb-4">{t('home.collectionsMadeForYou')}</h2>
-          <CollectionCards items={collectionItems} />
-        </section>
+        {collectionItems.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold mb-4">{t('home.collectionsMadeForYou')}</h2>
+            <CollectionCards items={collectionItems} />
+          </section>
+        )}
       </main>
 
       {/* 浮动操作按钮 */}

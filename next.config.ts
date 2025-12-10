@@ -60,6 +60,11 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/**',
       },
       {
+        protocol: 'https' as const,
+        hostname: 'files.sobrief.com',
+        pathname: '/**',
+      },
+      {
         protocol: 'http' as const,
         hostname: 'localhost',
         pathname: '/api/media/**',

@@ -1,13 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import React, { Suspense } from 'react'
-import { convertLexicalToHTML } from '@payloadcms/richtext-lexical/html'
+import { Suspense } from 'react'
 
 import LocaleSwitcher from '@/components/LocaleSwitcher'
-import { createTranslator, type Locale, isValidLocale } from '@/lib/translations'
+import { getCachedBookSummary, getCachedBookSummarySlugs } from '@/lib/cache'
 import { getAbsoluteImageUrl } from '@/lib/image-url'
-import { getCachedPost, getCachedPostSlugs } from '@/lib/cache'
+import { createTranslator, isValidLocale, type Locale } from '@/lib/translations'
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>
@@ -24,17 +23,17 @@ export async function generateMetadata(props: Props) {
   const t = createTranslator(locale)
 
   try {
-    const post = await getCachedPost(slug, locale)
+    const bookSummary = await getCachedBookSummary(slug, locale)
 
-    if (!post) {
+    if (!bookSummary) {
       return {
         title: t('bookSummary.notFound'),
       }
     }
 
     return {
-      title: post.title || t('bookSummary.summary'),
-      description: post.excerpt || undefined,
+      title: bookSummary.title || t('bookSummary.summary'),
+      description: bookSummary.desc || undefined,
     }
   } catch (error) {
     // 如果获取元数据失败，返回默认值
@@ -53,7 +52,7 @@ export async function generateStaticParams() {
 
   for (const locale of locales) {
     try {
-      const slugs = await getCachedPostSlugs(locale)
+      const slugs = await getCachedBookSummarySlugs(locale)
       if (slugs.length > 0) {
         for (const slug of slugs) {
           params.push({ locale, slug })
@@ -89,34 +88,36 @@ export default async function BlogPostPage(props: Props) {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.3min.top'
 
   // 使用缓存的查询结果
-  let post
+  let bookSummary
   try {
-    post = await getCachedPost(slug, locale)
+    bookSummary = await getCachedBookSummary(slug, locale)
   } catch (error) {
     // 如果查询失败，记录错误并返回 404
     console.error(`Failed to fetch post ${slug} for locale ${locale}:`, error)
     notFound()
   }
 
-  if (!post) {
+  if (!bookSummary) {
     notFound()
   }
 
   // 安全地获取字段值
-  const postTitle = post.title || t('bookSummary.summary')
+  const postTitle = bookSummary.title || t('bookSummary.summary')
   const featuredImage =
-    typeof post.featuredImage === 'object' && post.featuredImage ? post.featuredImage : null
+    typeof bookSummary.cover === 'object' && bookSummary.cover ? bookSummary.cover : null
 
+  const rawContent: any = bookSummary.rawContent || {}
   // 安全地转换内容
-  let contentHtml = ''
-  try {
-    if (typeof post.content === 'object' && post.content) {
-      contentHtml = convertLexicalToHTML({ data: post.content })
-    }
-  } catch (error) {
-    console.error(`Failed to convert content for post ${slug}:`, error)
-    contentHtml = ''
-  }
+  const contentHtml = rawContent['chapter-summary']
+  const aboutAuthor = rawContent['aboutAuthor']
+  // try {
+  //   if (typeof bookSummary.summary === 'object' && bookSummary.summary) {
+  //     contentHtml = convertLexicalToHTML({ data: bookSummary.summary })
+  //   }
+  // } catch (error) {
+  //   console.error(`Failed to convert content for post ${slug}:`, error)
+  //   contentHtml = ''
+  // }
 
   return (
     <div className="min-h-screen bg-white">
@@ -166,8 +167,8 @@ export default async function BlogPostPage(props: Props) {
 
         {/* 元信息 */}
         <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-600">
-          {post.publishedDate && typeof post.publishedDate === 'string' && (
-            <time dateTime={post.publishedDate} className="flex items-center gap-1">
+          {bookSummary.publishedDate && typeof bookSummary.publishedDate === 'string' && (
+            <time dateTime={bookSummary.publishedDate} className="flex items-center gap-1">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -176,7 +177,7 @@ export default async function BlogPostPage(props: Props) {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              {new Date(post.publishedDate).toLocaleDateString(
+              {new Date(bookSummary.publishedDate).toLocaleDateString(
                 locale === 'zh' ? 'zh-CN' : 'en-US',
                 {
                   year: 'numeric',
@@ -200,9 +201,9 @@ export default async function BlogPostPage(props: Props) {
         </div>
 
         {/* 摘要 */}
-        {post.excerpt && typeof post.excerpt === 'string' && (
+        {bookSummary.desc && typeof bookSummary.desc === 'string' && (
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
-            <p className="text-lg text-gray-700 leading-relaxed">{post.excerpt}</p>
+            <p className="text-lg text-gray-700 leading-relaxed">{bookSummary.desc}</p>
           </div>
         )}
 
@@ -210,8 +211,16 @@ export default async function BlogPostPage(props: Props) {
         {contentHtml && (
           <div className="prose prose-lg max-w-none">
             <div
-              className="text-gray-800 leading-relaxed"
+              className="text-gray-800 leading-relaxed whitespace-pre-wrap"
               dangerouslySetInnerHTML={{ __html: contentHtml }}
+            />
+          </div>
+        )}
+        {aboutAuthor && (
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
+            <div
+              className="text-gray-800 leading-relaxed whitespace-pre-wrap"
+              dangerouslySetInnerHTML={{ __html: aboutAuthor }}
             />
           </div>
         )}
