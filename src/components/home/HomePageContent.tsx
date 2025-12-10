@@ -38,13 +38,7 @@ export function HomePageContent({
   }))
 
   // 为微学习课程使用部分书籍数据
-  const microlearningItems = bookRecommendations.slice(0, 4).map((book) => ({
-    id: book.id,
-    title: book.title,
-    icon: '📚',
-    color: 'bg-gradient-to-br from-purple-500 to-pink-600',
-    slug: book.slug,
-  }))
+  const microlearningItems = bookRecommendations.slice(0, 4)
 
   // 转换合集数据
   const collectionItems = collections.map((collection) => ({
@@ -96,7 +90,7 @@ export function HomePageContent({
           <section>
             <h2 className="text-2xl font-bold mb-1">{t('home.dailyMicrolearning')}</h2>
             <p className="text-sm text-gray-600 mb-4">{t('home.dailyMicrolearningSubtitle')}</p>
-            <MicrolearningCards items={microlearningItems as any} />
+            <MicrolearningCards items={microlearningItems} />
           </section>
         )}
 
