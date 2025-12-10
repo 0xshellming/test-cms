@@ -3,3 +3,4 @@ export const common = {
   error: '发生错误',
   switchLanguage: '切换语言',
 } as const
+

@@ -2,7 +2,7 @@
 
 import { createTranslator, type Locale } from '@/lib/translations'
 import { BookSummary } from '@/payload-types'
-import { BookRecommendations } from './BookRecommendations'
+import { BookSummaryList } from './BookSummaryList'
 import { BottomNavigation } from './BottomNavigation'
 import { CardWithDrawerExample } from './CardWithDrawerExample'
 import { CategoryButtons } from './CategoryButtons'
@@ -27,17 +27,7 @@ export function HomePageContent({
   const t = createTranslator(locale)
 
   // 将 CMS 数据转换为组件需要的格式
-  const formattedBookRecommendations = bookRecommendations.slice(0, 6).map((book: BookSummary) => ({
-    id: book.id,
-    locale,
-    title: book.title,
-    description: book.desc || '',
-    author: book.author || '',
-    coverUrl: book.coverUrl || '',
-    coverColor: 'bg-gradient-to-br from-blue-600 to-indigo-700',
-    coverIcon: '📚',
-    slug: book.slug,
-  }))
+  const formattedBookRecommendations = bookRecommendations.slice(0, 6)
 
   const formattedCategories = categories.slice(0, 8).map((category) => ({
     id: category.id,
@@ -89,7 +79,7 @@ export function HomePageContent({
           <section>
             <h2 className="text-2xl font-bold mb-1">{t('home.youMightAlsoLike')}</h2>
             <p className="text-sm text-gray-600 mb-4">{t('home.youMightAlsoLikeSubtitle')}</p>
-            <BookRecommendations items={formattedBookRecommendations as any} />
+            <BookSummaryList items={formattedBookRecommendations as any} locale={locale} />
           </section>
         )}
 

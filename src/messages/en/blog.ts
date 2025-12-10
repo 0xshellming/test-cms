@@ -10,3 +10,4 @@ export const blog = {
   blogPost: 'Blog Post',
   description: 'View all blog posts',
 } as const
+

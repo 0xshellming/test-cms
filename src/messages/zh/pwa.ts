@@ -27,3 +27,4 @@ export const pwa = {
     cacheCleared: '缓存已清除',
   },
 } as const
+

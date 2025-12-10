@@ -3,3 +3,4 @@ export const common = {
   error: 'An error occurred',
   switchLanguage: 'Switch language',
 } as const
+
