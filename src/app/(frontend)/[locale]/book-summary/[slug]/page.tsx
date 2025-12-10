@@ -84,7 +84,7 @@ export default async function BlogPostPage(props: Props) {
 
   // 使用环境变量或默认值作为 baseUrl
   // 注意：在静态生成时不能使用 headers，所以使用环境变量
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.3min.top'
+  const _baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.3min.top'
 
   // 使用缓存的查询结果
   let bookSummary
@@ -101,8 +101,8 @@ export default async function BlogPostPage(props: Props) {
   }
 
   // 安全地获取字段值
-  const postTitle = bookSummary.title || t('bookSummary.summary')
-  const featuredImage =
+  const _postTitle = bookSummary.title || t('bookSummary.summary')
+  const _featuredImage =
     typeof bookSummary.cover === 'object' && bookSummary.cover ? bookSummary.cover : null
 
   // try {
