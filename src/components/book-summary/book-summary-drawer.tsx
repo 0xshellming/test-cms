@@ -1,7 +1,6 @@
 'use client'
 
 import { BookOpen, Headphones, ChevronRight, Ban } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import {
@@ -17,6 +16,7 @@ import { BookSummary } from '@/payload-types'
 import { createTranslator, type Locale } from '@/lib/translations'
 import { StaticMarkdown } from '../markdown-renderer/markdown-renderer'
 import Image from 'next/image'
+import { ScrollRestorationLink } from '../ui/scroll-restoration-link'
 
 type BookSummaryDrawerProps = {
   children: React.ReactNode
@@ -60,7 +60,7 @@ export function BookSummaryDrawer({ children, bookSummary, locale }: BookSummary
     <Drawer>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="rounded-t-3xl " aria-label={bookSummary.title}>
-        <div className="mx-auto w-full max-w-md px-6 max-h-[75vh] overflow-scroll pb-8">
+        <div className="mx-auto w-full px-6 max-h-[75vh] overflow-scroll pb-8">
           <DrawerHeader className="pt-6 pb-4 text-center gap-1">
             <Image
               className="rounded block mx-auto"
@@ -69,20 +69,19 @@ export function BookSummaryDrawer({ children, bookSummary, locale }: BookSummary
               width={150}
               height={100}
             />
-            <DrawerTitle className="text-2xl font-bold">{bookSummary.title}</DrawerTitle>
-            <DrawerDescription className="text-base text-gray-600 -mt-1">
+            <DrawerTitle className="text-2xl font-bold text-center">
+              {bookSummary.title}
+            </DrawerTitle>
+            <DrawerDescription className="text-base text-gray-600 -mt-1 text-center">
               {bookSummary.author}
             </DrawerDescription>
           </DrawerHeader>
 
           {/* 可滚动内容区域 */}
           <div className="space-y-6">
-            {/* What's inside / You'll learn 部分 */}
+            {/* 简介 */}
             {bookSummary.desc && (
-              <section className="space-y-3">
-                <h3 className="font-bold text-lg text-gray-900">{t('bookSummary.whatIsInside')}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{bookSummary.desc}</p>
-              </section>
+              <p className="text-sm text-gray-600 leading-relaxed">{bookSummary.desc}</p>
             )}
 
             {/* You'll learn 部分 (使用 summary Markdown) */}
@@ -149,7 +148,24 @@ export function BookSummaryDrawer({ children, bookSummary, locale }: BookSummary
                 <h3 id="about-author-heading" className="font-bold text-lg text-gray-900">
                   {t('bookSummary.aboutThisGem')}
                 </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{bookSummary.aboutAuthor}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  <StaticMarkdown content={bookSummary.aboutAuthor} />
+                </p>
+              </section>
+            )}
+
+            {/* 关于作者部分 */}
+            {bookSummary.review && (
+              <section className="space-y-3" aria-labelledby="about-author-heading">
+                <h3 id="about-author-heading" className="font-bold text-lg text-gray-900">
+                  {t('bookSummary.reviews')}
+                </h3>
+                <div>
+                  {bookSummary.metadata?.ratingValue} {bookSummary.metadata?.ratingsCount}
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  <StaticMarkdown content={bookSummary.review} />
+                </p>
               </section>
             )}
 
@@ -190,25 +206,27 @@ export function BookSummaryDrawer({ children, bookSummary, locale }: BookSummary
             className="flex-1 gap-2 h-12 rounded-xl border-2 border-gray-300 hover:bg-gray-50 font-semibold focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             asChild
           >
-            <Link
+            <ScrollRestorationLink
               href={`/${locale}/book-summary/${bookSummary.slug}`}
               aria-label={t('bookSummary.readAriaLabel')}
+              scrollKey={`home-scroll-${locale}`}
             >
               <BookOpen className="h-5 w-5" aria-hidden="true" />
               {t('bookSummary.read')}
-            </Link>
+            </ScrollRestorationLink>
           </Button>
           <Button
             className="flex-1 gap-2 h-12 rounded-xl bg-blue-600 hover:bg-blue-700 font-semibold focus:ring-2 focus:ring-blue-700 focus:ring-offset-2"
             asChild
           >
-            <Link
+            <ScrollRestorationLink
               href={`/${locale}/book-summary/${bookSummary.slug}`}
               aria-label={t('bookSummary.listenAriaLabel')}
+              scrollKey={`home-scroll-${locale}`}
             >
               <Headphones className="h-5 w-5" aria-hidden="true" />
               {t('bookSummary.listen')}
-            </Link>
+            </ScrollRestorationLink>
           </Button>
         </DrawerFooter>
       </DrawerContent>

@@ -10,6 +10,7 @@ import { CollectionCards } from './CollectionCards'
 import { FreeDailyRead } from './FreeDailyRead'
 import { HomeHeader } from './HomeHeader'
 import { MicrolearningCards } from './MicrolearningCards'
+import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 type Props = {
   locale: Locale
@@ -25,6 +26,9 @@ export function HomePageContent({
   categories = [],
 }: Props) {
   const t = createTranslator(locale)
+
+  // 使用滚动位置恢复 hook
+  useScrollRestoration(`home-scroll-${locale}`)
 
   // 将 CMS 数据转换为组件需要的格式
   const formattedBookRecommendations = bookRecommendations.slice(0, 6)

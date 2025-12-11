@@ -319,7 +319,26 @@ export interface BookSummary {
    */
   chapterSummary?: string | null;
   review?: string | null;
-  faq?: string | null;
+  /**
+   * 书籍的常见问题列表
+   */
+  faq?:
+    | {
+        /**
+         * 问题的序号
+         */
+        index: number;
+        /**
+         * 问题的标题
+         */
+        title: string;
+        /**
+         * 问题的详细内容
+         */
+        content: string;
+        id?: string | null;
+      }[]
+    | null;
   summaryReviews?: string | null;
   publishedDate?: string | null;
   seo?: {
@@ -808,7 +827,14 @@ export interface BookSummariesSelect<T extends boolean = true> {
       };
   chapterSummary?: T;
   review?: T;
-  faq?: T;
+  faq?:
+    | T
+    | {
+        index?: T;
+        title?: T;
+        content?: T;
+        id?: T;
+      };
   summaryReviews?: T;
   publishedDate?: T;
   seo?:

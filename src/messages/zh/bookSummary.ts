@@ -1,5 +1,6 @@
 export const bookSummary = {
   title: '书籍摘要',
+  reviews: '书评',
   backToHome: '返回首页',
   notFound: '摘要未找到',
   summary: '摘要',

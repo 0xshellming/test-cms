@@ -188,9 +188,42 @@ export const BookSummaries: CollectionConfig = {
     // FAQ
     {
       name: 'faq',
-      type: 'textarea',
-      localized: true,
-      label: '常见问题（FAQ）',
+      type: 'array',
+      label: '常见问题',
+      admin: {
+        description: '书籍的常见问题列表',
+      },
+      fields: [
+        {
+          name: 'index',
+          type: 'number',
+          required: true,
+          label: '序号',
+          admin: {
+            description: '问题的序号',
+          },
+        },
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+          localized: true,
+          label: '标题',
+          admin: {
+            description: '问题的标题',
+          },
+        },
+        {
+          name: 'content',
+          type: 'textarea',
+          required: true,
+          localized: true,
+          label: '内容',
+          admin: {
+            description: '问题的详细内容',
+          },
+        },
+      ],
     },
 
     // 读者评论摘要

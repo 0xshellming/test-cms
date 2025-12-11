@@ -3,7 +3,7 @@
 import { createTranslator, type Locale } from '@/lib/translations'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { ScrollRestorationLink } from '../ui/scroll-restoration-link'
 
 type Props = {
   locale: Locale
@@ -13,7 +13,10 @@ export function FreeDailyRead({ locale }: Props) {
   const t = createTranslator(locale)
 
   return (
-    <Link href={`/${locale}/book-summary/test`}>
+    <ScrollRestorationLink
+      href={`/${locale}/book-summary/test`}
+      scrollKey={`home-scroll-${locale}`}
+    >
       <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-6 shadow-lg overflow-hidden relative cursor-pointer hover:shadow-xl transition-all active:scale-[0.98]">
         <div className="relative z-10">
           <h2 className="text-3xl font-bold text-white mb-6">{t('home.freeDailyRead')}</h2>
@@ -45,6 +48,6 @@ export function FreeDailyRead({ locale }: Props) {
           </div>
         </div>
       </div>
-    </Link>
+    </ScrollRestorationLink>
   )
 }

@@ -147,6 +147,13 @@ export default async function BlogPostPage(props: Props) {
             <StaticMarkdown content={keypoint.content} />
           </div>
         ))}
+
+        {bookSummary.faq && (
+          <div>
+            <h3>FAQ</h3>
+            <StaticMarkdown content={bookSummary.faq} />
+          </div>
+        )}
       </article>
     </div>
   )

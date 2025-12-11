@@ -1,5 +1,6 @@
 export const bookSummary = {
   title: 'Book Summary',
+  reviews: 'Reviews',
   backToHome: 'Back to Home',
   notFound: 'Summary not found',
   summary: 'Summary',
