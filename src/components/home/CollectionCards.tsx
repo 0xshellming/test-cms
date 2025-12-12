@@ -2,9 +2,9 @@
 
 import { cn } from '@/lib/utils'
 import { Sparkles } from 'lucide-react'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { type Locale } from '@/lib/translations'
+import { ScrollRestorationLink } from '../ui/scroll-restoration-link'
 
 type CollectionItem = {
   id: string
@@ -27,7 +27,11 @@ export function CollectionCards({ items }: Props) {
     <div className="overflow-x-auto -mx-4 px-4">
       <div className="flex gap-4 pb-4">
         {items.map((item) => (
-          <Link key={item.id} href={`/${locale}/book-summary/test`}>
+          <ScrollRestorationLink
+            key={item.id}
+            href={`/${locale}/book-summary/test`}
+            scrollKey={`home-scroll-${locale}`}
+          >
             <div
               className={cn(
                 'flex-shrink-0 w-80 h-56 rounded-2xl shadow-lg p-6 flex flex-col justify-between cursor-pointer hover:shadow-xl transition-all active:scale-[0.98] relative overflow-hidden',
@@ -67,7 +71,7 @@ export function CollectionCards({ items }: Props) {
               {/* 装饰性底部元素 */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
             </div>
-          </Link>
+          </ScrollRestorationLink>
         ))}
       </div>
     </div>

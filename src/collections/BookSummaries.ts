@@ -13,6 +13,53 @@ export const BookSummaries: CollectionConfig = {
     update: () => true, // 添加这行
     delete: () => true, // 添加这行（可选）
   },
+  hooks: {
+    beforeChange: [
+      async ({ data, req, operation }) => {
+        // Only run on create or update
+        if (operation === 'create' || operation === 'update') {
+          // If topics are already manually set, we might want to respect that?
+          // For now, let's append/update based on tags if present.
+          
+          const tags = data.metadata?.tags?.map((t: { tag: string }) => t.tag) || []
+          
+          if (tags.length > 0) {
+            // Find topics that match these tags in their keywords
+            // Since we can't easily do a "where keywords.keyword IN tags" efficient query in all adapters without custom query logic or iterating,
+            // we'll try a flexible search. Or simpler: iterate all topics (cache them?) or search by keyword one by one?
+            // "where keywords.keyword in [list]" is supported by Payload? 
+            // Yes, usually `in` works on array fields if configured right, but deep match on array structure might be tricky.
+            // Let's try to query topics where 'keywords.keyword' is in our tags list.
+            
+            try {
+                const matchedTopics = await req.payload.find({
+                    collection: 'topics',
+                    where: {
+                        'keywords.keyword': {
+                            in: tags
+                        }
+                    },
+                    limit: 100,
+                });
+
+                if (matchedTopics.docs.length > 0) {
+                    const topicIds = matchedTopics.docs.map(t => t.id);
+                    // Merge with existing topics if any?
+                    // data.topics might be undefined or array of IDs
+                    const existingTopics = Array.isArray(data.topics) ? data.topics : [];
+                    // Ensure unique IDs
+                    const allTopics = Array.from(new Set([...existingTopics, ...topicIds]));
+                    data.topics = allTopics;
+                }
+            } catch (e) {
+                console.error("Error matching topics:", e);
+            }
+          }
+        }
+        return data
+      },
+    ],
+  },
   fields: [
     // 基本信息
     {
@@ -116,12 +163,54 @@ export const BookSummaries: CollectionConfig = {
     // 总结内容（短版）
     {
       name: 'summary',
-      type: 'richText',
+      type: 'textarea',
       localized: true,
+      required: true,
       label: '书籍摘要',
       admin: {
-        description: '书籍的简短摘要',
+        description: '你会获得, Markdown 格式, Bullet List 格式',
       },
+    },
+
+    // 关键要点
+    {
+      name: 'keypoints',
+      type: 'array',
+      label: '关键要点',
+      admin: {
+        description: '书籍的关键要点列表',
+      },
+      fields: [
+        {
+          name: 'index',
+          type: 'number',
+          required: true,
+          label: '序号',
+          admin: {
+            description: '要点的序号',
+          },
+        },
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+          localized: true,
+          label: '标题',
+          admin: {
+            description: '要点的标题',
+          },
+        },
+        {
+          name: 'content',
+          type: 'textarea',
+          required: true,
+          localized: true,
+          label: '内容',
+          admin: {
+            description: '要点的详细内容',
+          },
+        },
+      ],
     },
 
     // 详细章节总结
@@ -146,9 +235,42 @@ export const BookSummaries: CollectionConfig = {
     // FAQ
     {
       name: 'faq',
-      type: 'textarea',
-      localized: true,
-      label: '常见问题（FAQ）',
+      type: 'array',
+      label: '常见问题',
+      admin: {
+        description: '书籍的常见问题列表',
+      },
+      fields: [
+        {
+          name: 'index',
+          type: 'number',
+          required: true,
+          label: '序号',
+          admin: {
+            description: '问题的序号',
+          },
+        },
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+          localized: true,
+          label: '标题',
+          admin: {
+            description: '问题的标题',
+          },
+        },
+        {
+          name: 'content',
+          type: 'textarea',
+          required: true,
+          localized: true,
+          label: '内容',
+          admin: {
+            description: '问题的详细内容',
+          },
+        },
+      ],
     },
 
     // 读者评论摘要
@@ -158,19 +280,6 @@ export const BookSummaries: CollectionConfig = {
       localized: true,
       label: '读者评论摘要',
     },
-
-    // 完整内容（JSON格式存储）
-    {
-      name: 'rawContent',
-      type: 'json',
-      localized: true,
-      label: '原始内容（JSON）',
-      admin: {
-        description: '完整的书籍数据 JSON，用于数据导入和备份',
-      },
-    },
-
-    // 注：合集关联已移至 Collections 模型的 items 字段（多态关系）
 
     // 发布日期
     {
@@ -209,6 +318,16 @@ export const BookSummaries: CollectionConfig = {
           label: '关键词',
         },
       ],
+    },
+    {
+      name: 'topics',
+      type: 'relationship',
+      relationTo: 'topics',
+      hasMany: true,
+      label: 'Topics',
+      admin: {
+        position: 'sidebar',
+      },
     },
   ],
   versions: {

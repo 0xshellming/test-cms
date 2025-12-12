@@ -2,38 +2,25 @@
 
 import { cn } from '@/lib/utils'
 import { Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { type Locale } from '@/lib/translations'
-
-type MicrolearningItem = {
-  id: string
-  title: string
-  icon?: string
-  tags?: string[]
-  color: string
-}
+import { BookSummaryDrawer } from '../book-summary/book-summary-drawer'
+import { BookSummary } from '@/payload-types'
 
 type Props = {
-  items: MicrolearningItem[]
+  items: BookSummary[]
 }
 
 export function MicrolearningCards({ items }: Props) {
-  const pathname = usePathname()
-  const locale = pathname.split('/')[1] as Locale
-
   return (
     <div className="overflow-x-auto -mx-4 px-4">
       <div className="flex gap-4 pb-4">
         {items.map((item) => (
-          <Link key={item.id} href={`/${locale}/book-summary/test`}>
+          <BookSummaryDrawer key={item.id} bookSummary={item} locale={'zh'}>
             <div
               className={cn(
                 'flex-shrink-0 w-52 h-56 rounded-2xl shadow-lg p-6',
                 'flex flex-col justify-between cursor-pointer',
                 'hover:shadow-xl transition-all active:scale-[0.98]',
                 'relative overflow-hidden',
-                item.color,
               )}
             >
               {/* 装饰性背景层 */}
@@ -50,29 +37,6 @@ export function MicrolearningCards({ items }: Props) {
 
               {/* 内容 */}
               <div className="relative z-10 flex flex-col h-full">
-                {/* 标签 */}
-                {item.tags && (
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {item.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="text-xs bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-md font-bold text-gray-800"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* 图标 - 居中显示 */}
-                {item.icon && (
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className="text-7xl transform hover:scale-110 transition-transform">
-                      {item.icon}
-                    </div>
-                  </div>
-                )}
-
                 {/* 标题 */}
                 <h3 className="font-bold text-xl text-white line-clamp-2 leading-tight text-center mt-4">
                   {item.title}
@@ -82,7 +46,7 @@ export function MicrolearningCards({ items }: Props) {
               {/* 底部装饰线 */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
             </div>
-          </Link>
+          </BookSummaryDrawer>
         ))}
       </div>
     </div>

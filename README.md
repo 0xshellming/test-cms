@@ -64,21 +64,75 @@ Wrangler is pretty smart so it will automatically bind your services for local d
 
 ## Deployments
 
-When you're ready to deploy, first make sure you have created your migrations:
+### 构建流程概览
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        完整构建部署流程                               │
+├─────────────────────────────────────────────────────────────────────┤
+│  1. npm run build                                                   │
+│     └── Next.js 编译，生成 .next 目录                                │
+│                                                                     │
+│  2. npm run deploy                                                  │
+│     ├── deploy:database                                             │
+│     │   ├── payload migrate          # 执行数据库迁移                │
+│     │   └── wrangler d1 execute      # 优化数据库                    │
+│     │                                                               │
+│     └── deploy:app                                                  │
+│         ├── opennextjs-cloudflare build                             │
+│         │   └── 生成 .open-next/worker.js                           │
+│         └── opennextjs-cloudflare deploy                            │
+│             └── 部署到 Cloudflare Workers                           │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 本地部署
+
+1. **创建数据库迁移**（如果有 schema 变更）：
 
 ```bash
 pnpm payload migrate:create
 ```
 
-Then run the following command:
+2. **执行部署**：
 
 ```bash
 pnpm run deploy
 ```
 
-This will spin up Wrangler in `production` mode, run any created migrations, build the app and then deploy the bundle up to Cloudflare.
+这个命令会依次执行：
 
-That's it! You can if you wish move these steps into your CI pipeline as well.
+- 数据库迁移
+- OpenNext 构建（生成 `.open-next/worker.js`）
+- Cloudflare Workers 部署
+
+### CI/CD 部署 (Cloudflare Pages)
+
+在 Cloudflare Pages 或其他 CI 平台配置时：
+
+#### main 分支（生产环境）
+
+| 配置项         | 值               |
+| -------------- | ---------------- |
+| Build command  | `npm run build`  |
+| Deploy command | `npm run deploy` |
+
+#### 非 main 分支（Preview 环境）
+
+| 配置项         | 值                       |
+| -------------- | ------------------------ |
+| Build command  | `npm run build`          |
+| Deploy command | `npm run deploy:preview` |
+
+> ⚠️ **重要**：
+>
+> - **生产部署**使用 `npm run deploy`，会执行完整部署流程
+> - **Preview 部署**使用 `npm run deploy:preview`，只上传版本不激活到生产
+> - 不要直接使用 `npx wrangler versions upload`，否则会因为缺少 `.open-next/worker.js` 文件而失败
+
+### 常见问题
+
+如果构建失败，请参考 [Cloudflare 构建失败排查指南](./docs/troubleshooting/cloudflare-build-failures.md)。
 
 ## Enabling logs
 

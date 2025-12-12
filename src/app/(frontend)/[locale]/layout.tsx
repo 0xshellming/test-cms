@@ -28,7 +28,7 @@ export default async function LocaleLayout(props: Props) {
   const locale = localeParam as Locale
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body>
         <ServiceWorkerRegistration locale={locale} />
         <main>{children}</main>

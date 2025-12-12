@@ -1,8 +1,8 @@
 'use client'
 
 import { createTranslator, type Locale } from '@/lib/translations'
-import { BookSummary } from '@/payload-types'
-import { BookRecommendations } from './BookRecommendations'
+import { BookSummary, Topic } from '@/payload-types'
+import { BookSummaryList } from './BookSummaryList'
 import { BottomNavigation } from './BottomNavigation'
 import { CardWithDrawerExample } from './CardWithDrawerExample'
 import { CategoryButtons } from './CategoryButtons'
@@ -10,51 +10,33 @@ import { CollectionCards } from './CollectionCards'
 import { FreeDailyRead } from './FreeDailyRead'
 import { HomeHeader } from './HomeHeader'
 import { MicrolearningCards } from './MicrolearningCards'
+import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 type Props = {
   locale: Locale
   collections?: any[]
   bookRecommendations?: BookSummary[]
-  categories?: any[]
+  topics?: Topic[]
 }
 
 export function HomePageContent({
   locale,
   collections = [],
   bookRecommendations = [],
-  categories = [],
+  topics = [],
 }: Props) {
   const t = createTranslator(locale)
 
-  // 将 CMS 数据转换为组件需要的格式
-  const formattedBookRecommendations = bookRecommendations.slice(0, 6).map((book: BookSummary) => ({
-    id: book.id,
-    locale,
-    title: book.title,
-    description: book.desc || '',
-    author: book.author || '',
-    coverUrl: book.coverUrl || '',
-    coverColor: 'bg-gradient-to-br from-blue-600 to-indigo-700',
-    coverIcon: '📚',
-    slug: book.slug,
-  }))
+  // 使用滚动位置恢复 hook
+  useScrollRestoration(`home-scroll-${locale}`)
 
-  const formattedCategories = categories.slice(0, 8).map((category) => ({
-    id: category.id,
-    name: category.name,
-    icon: '📖',
-    color: 'bg-blue-100',
-    slug: category.slug,
-  }))
+  // 将 CMS 数据转换为组件需要的格式
+  const formattedBookRecommendations = bookRecommendations.slice(0, 6)
+
+  const formattedtopics = topics.slice(0, 8)
 
   // 为微学习课程使用部分书籍数据
-  const microlearningItems = bookRecommendations.slice(0, 4).map((book) => ({
-    id: book.id,
-    title: book.title,
-    icon: '📚',
-    color: 'bg-gradient-to-br from-purple-500 to-pink-600',
-    slug: book.slug,
-  }))
+  const microlearningItems = bookRecommendations.slice(0, 4)
 
   // 转换合集数据
   const collectionItems = collections.map((collection) => ({
@@ -89,15 +71,15 @@ export function HomePageContent({
           <section>
             <h2 className="text-2xl font-bold mb-1">{t('home.youMightAlsoLike')}</h2>
             <p className="text-sm text-gray-600 mb-4">{t('home.youMightAlsoLikeSubtitle')}</p>
-            <BookRecommendations items={formattedBookRecommendations as any} />
+            <BookSummaryList items={formattedBookRecommendations as any} locale={locale} />
           </section>
         )}
 
         {/* 你感兴趣的类别 */}
-        {formattedCategories.length > 0 && (
+        {formattedtopics.length > 0 && (
           <section>
             <h2 className="text-2xl font-bold mb-4">{t('home.categoriesInterested')}</h2>
-            <CategoryButtons items={formattedCategories} />
+            <CategoryButtons items={formattedtopics} locale={locale} />
           </section>
         )}
 
@@ -106,7 +88,7 @@ export function HomePageContent({
           <section>
             <h2 className="text-2xl font-bold mb-1">{t('home.dailyMicrolearning')}</h2>
             <p className="text-sm text-gray-600 mb-4">{t('home.dailyMicrolearningSubtitle')}</p>
-            <MicrolearningCards items={microlearningItems as any} />
+            <MicrolearningCards items={microlearningItems} />
           </section>
         )}
 
