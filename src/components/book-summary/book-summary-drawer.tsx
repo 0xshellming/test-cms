@@ -1,6 +1,6 @@
 'use client'
 
-import { BookOpen, Headphones, ChevronRight, Ban } from 'lucide-react'
+import { BookOpen, Headphones, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import {

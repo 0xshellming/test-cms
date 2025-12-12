@@ -1,15 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createTranslator, type Locale } from '@/lib/translations'
+import type { Locale } from '@/lib/translations'
 
 type Props = {
   locale: Locale
 }
 
-export function ServiceWorkerRegistration({ locale }: Props) {
-  const t = createTranslator(locale)
-  const [isOnline, setIsOnline] = useState(true)
+export function ServiceWorkerRegistration({ locale: _locale }: Props) {
+  const [_isOnline, setIsOnline] = useState(true)
   const [swRegistration, setSwRegistration] = useState<globalThis.ServiceWorkerRegistration | null>(
     null,
   )
@@ -66,8 +65,9 @@ export function ServiceWorkerRegistration({ locale }: Props) {
     }
   }
 
-  // 手动更新 Service Worker
-  async function updateServiceWorker() {
+  // 手动更新 Service Worker（预留功能）
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const updateServiceWorker = async () => {
     if (swRegistration) {
       try {
         await swRegistration.update()
@@ -84,12 +84,3 @@ export function ServiceWorkerRegistration({ locale }: Props) {
 
   return <div />
 }
-
-
-
-
-
-
-
-
-

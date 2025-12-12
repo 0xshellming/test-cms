@@ -73,22 +73,22 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   // We'll use a try-catch to handle the error gracefully
   try {
     await db.run(sql`ALTER TABLE \`posts\` DROP COLUMN \`title\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`posts\` DROP COLUMN \`slug\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`posts\` DROP COLUMN \`excerpt\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`posts\` DROP COLUMN \`content\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
 
@@ -98,12 +98,12 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   // SQLite doesn't support ADD COLUMN IF NOT EXISTS, so we use try-catch
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` ADD \`snapshot\` integer;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` ADD \`published_locale\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
 
@@ -116,22 +116,22 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` DROP COLUMN \`version_title\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` DROP COLUMN \`version_slug\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` DROP COLUMN \`version_excerpt\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` DROP COLUMN \`version_content\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
 
@@ -139,17 +139,17 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 
   try {
     await db.run(sql`ALTER TABLE \`categories\` DROP COLUMN \`name\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`categories\` DROP COLUMN \`slug\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`categories\` DROP COLUMN \`description\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
 
@@ -157,17 +157,17 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 
   try {
     await db.run(sql`ALTER TABLE \`tags\` DROP COLUMN \`name\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`tags\` DROP COLUMN \`slug\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
   try {
     await db.run(sql`ALTER TABLE \`tags\` DROP COLUMN \`description\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist or already dropped
   }
 }
@@ -182,22 +182,22 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
 
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` ADD \`version_title\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` ADD \`version_slug\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` ADD \`version_excerpt\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` ADD \`version_content\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
 
@@ -207,33 +207,33 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
 
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` DROP COLUMN \`snapshot\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist
   }
   try {
     await db.run(sql`ALTER TABLE \`_posts_v\` DROP COLUMN \`published_locale\`;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might not exist
   }
 
   try {
     await db.run(sql`ALTER TABLE \`posts\` ADD \`title\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`posts\` ADD \`slug\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`posts\` ADD \`excerpt\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`posts\` ADD \`content\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
 
@@ -241,17 +241,17 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
 
   try {
     await db.run(sql`ALTER TABLE \`categories\` ADD \`name\` text NOT NULL;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`categories\` ADD \`slug\` text NOT NULL;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`categories\` ADD \`description\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
 
@@ -261,17 +261,17 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
 
   try {
     await db.run(sql`ALTER TABLE \`tags\` ADD \`name\` text NOT NULL;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`tags\` ADD \`slug\` text NOT NULL;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
   try {
     await db.run(sql`ALTER TABLE \`tags\` ADD \`description\` text;`)
-  } catch (e) {
+  } catch (_e) {
     // Column might already exist
   }
 

@@ -21,6 +21,7 @@ export type TranslationKey = NestedKeyOf<(typeof translations)['zh']>
 // 类型安全的获取翻译文本函数
 export function getTranslation(locale: Locale, key: TranslationKey): string {
   const keys = key.split('.')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let value: any = translations[locale]
 
   for (const k of keys) {

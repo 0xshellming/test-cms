@@ -2,7 +2,6 @@
 
 import { createTranslator, type Locale } from '@/lib/translations'
 import { Target, ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
 type Props = {

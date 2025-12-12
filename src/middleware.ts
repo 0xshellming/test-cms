@@ -21,6 +21,7 @@ function getPreferredLocale(request: NextRequest): string {
 
   // 查找第一个支持的语言
   for (const lang of languages) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (locales.includes(lang as any)) {
       return lang
     }
@@ -75,12 +76,3 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|admin).*)',
   ],
 }
-
-
-
-
-
-
-
-
-

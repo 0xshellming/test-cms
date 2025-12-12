@@ -38,7 +38,7 @@ type Props = {
   locale?: string
 }
 
-export function CardWithDrawer({ card, locale = 'en' }: Props) {
+export function CardWithDrawer({ card, locale: _locale = 'en' }: Props) {
   const [open, setOpen] = useState(false)
 
   return (

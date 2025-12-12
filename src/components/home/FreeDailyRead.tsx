@@ -2,7 +2,6 @@
 
 import { createTranslator, type Locale } from '@/lib/translations'
 import { ArrowRight } from 'lucide-react'
-import Image from 'next/image'
 import { ScrollRestorationLink } from '../ui/scroll-restoration-link'
 
 type Props = {

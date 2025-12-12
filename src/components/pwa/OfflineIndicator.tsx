@@ -9,7 +9,7 @@ type Props = {
 
 export default function OfflineIndicator({ locale }: Props) {
   const t = createTranslator(locale)
-  const [isOnline, setIsOnline] = useState(true)
+  const [_isOnline, setIsOnline] = useState(true)
   const [showOfflineBanner, setShowOfflineBanner] = useState(false)
 
   useEffect(() => {
@@ -74,12 +74,3 @@ export default function OfflineIndicator({ locale }: Props) {
     </div>
   )
 }
-
-
-
-
-
-
-
-
-

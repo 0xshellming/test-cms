@@ -7,26 +7,35 @@ type Props = {
   locale: Locale
 }
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+}
+
 export default function InstallPrompt({ locale }: Props) {
   const t = createTranslator(locale)
   const [isIOS, setIsIOS] = useState(false)
   const [isStandalone, setIsStandalone] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
 
   useEffect(() => {
     // 检测 iOS 设备
-    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream)
+    setIsIOS(
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+        !('MSStream' in window && (window as { MSStream?: unknown }).MSStream),
+    )
 
     // 检测是否已安装（standalone 模式）
     setIsStandalone(
       window.matchMedia('(display-mode: standalone)').matches ||
-        (window.navigator as any).standalone === true,
+        ('standalone' in window.navigator &&
+          (window.navigator as { standalone?: boolean }).standalone === true),
     )
 
     // 监听 beforeinstallprompt 事件（Chrome/Edge）
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
-      setDeferredPrompt(e)
+      setDeferredPrompt(e as BeforeInstallPromptEvent)
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -77,12 +86,3 @@ export default function InstallPrompt({ locale }: Props) {
     </div>
   )
 }
-
-
-
-
-
-
-
-
-

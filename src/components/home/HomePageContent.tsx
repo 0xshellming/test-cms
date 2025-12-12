@@ -14,7 +14,19 @@ import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 type Props = {
   locale: Locale
-  collections?: any[]
+  collections?: Array<{
+    id: number | string
+    locale?: string
+    slug: string
+    title: string
+    desc?: string
+    displaySettings?: {
+      icon?: string
+      customBgColor?: string
+      bgColor?: string
+    }
+    itemCount?: number
+  }>
   bookRecommendations?: BookSummary[]
   topics?: Topic[]
 }
@@ -40,7 +52,7 @@ export function HomePageContent({
 
   // 转换合集数据
   const collectionItems = collections.map((collection) => ({
-    id: collection.id,
+    id: String(collection.id),
     locale: collection.locale,
     slug: collection.slug,
     title: collection.title,
@@ -71,7 +83,7 @@ export function HomePageContent({
           <section>
             <h2 className="text-2xl font-bold mb-1">{t('home.youMightAlsoLike')}</h2>
             <p className="text-sm text-gray-600 mb-4">{t('home.youMightAlsoLikeSubtitle')}</p>
-            <BookSummaryList items={formattedBookRecommendations as any} locale={locale} />
+            <BookSummaryList items={formattedBookRecommendations} locale={locale} />
           </section>
         )}
 
