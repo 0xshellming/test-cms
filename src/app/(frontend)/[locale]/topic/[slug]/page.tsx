@@ -50,14 +50,21 @@ export default async function TopicPage(props: Props) {
   const payload = await getPayload({ config })
 
   // Fetch Topic
-  const topicQuery = await payload.find({
-    collection: 'topics',
-    where: {
-      slug: { equals: slug },
-    },
-    locale,
-    limit: 1,
-  })
+  // Fetch Topic
+  let topicQuery
+  try {
+    topicQuery = await payload.find({
+      collection: 'topics',
+      where: {
+        slug: { equals: slug },
+      },
+      locale,
+      limit: 1,
+    })
+  } catch (error) {
+    console.error('Failed to fetch topic:', error)
+    notFound()
+  }
 
   if (!topicQuery.docs.length) {
     notFound()
@@ -66,18 +73,22 @@ export default async function TopicPage(props: Props) {
   const topic = topicQuery.docs[0]
 
   // Fetch Books
-  const booksQuery = await payload.find({
-    collection: 'book-summaries',
-    where: {
-      topics: { equals: topic.id },
-      _status: { equals: 'published' },
-    },
-    locale,
-    sort: '-publishedDate',
-    limit: 100,
-  })
-
-  const books = booksQuery.docs
+  let books: BookSummary[] = []
+  try {
+    const booksQuery = await payload.find({
+      collection: 'book-summaries',
+      where: {
+        topics: { equals: topic.id },
+        _status: { equals: 'published' },
+      },
+      locale,
+      sort: '-publishedDate',
+      limit: 100,
+    })
+    books = booksQuery.docs
+  } catch (error) {
+    console.error('Failed to fetch books for topic:', error)
+  }
 
   // Helper to get image URL
   const getCoverUrl = (book: BookSummary) => {
