@@ -148,10 +148,17 @@ export default async function BlogPostPage(props: Props) {
           </div>
         ))}
 
-        {bookSummary.faq && (
+        {bookSummary.faq?.length && (
           <div>
             <h3>FAQ</h3>
-            <StaticMarkdown content={bookSummary.faq} />
+            {
+              bookSummary.faq.map((faq) => (
+                <div key={faq.index}>
+                  <h4>{faq.title}</h4>
+                  <StaticMarkdown content={faq.content} />
+                </div>
+              ))
+            }
           </div>
         )}
       </article>
