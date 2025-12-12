@@ -82,3 +82,5 @@ export default function InstallPrompt({ locale }: Props) {
 
 
 
+
+
