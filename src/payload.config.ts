@@ -31,6 +31,7 @@ const cloudflare =
     : await getCloudflareContext({ async: true })
 
 export default buildConfig({
+  debug: true,
   admin: {
     user: Users.slug,
     importMap: {
