@@ -377,6 +377,14 @@ export interface Topic {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Hex code for background color (e.g., #F3E5F5)
+   */
+  backgroundColor?: string | null;
+  /**
+   * Order for sorting topics (lower numbers first)
+   */
+  sort?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1005,6 +1013,8 @@ export interface TopicsSelect<T extends boolean = true> {
         keyword?: T;
         id?: T;
       };
+  backgroundColor?: T;
+  sort?: T;
   updatedAt?: T;
   createdAt?: T;
 }

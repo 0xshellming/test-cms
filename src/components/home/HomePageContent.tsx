@@ -1,7 +1,7 @@
 'use client'
 
 import { createTranslator, type Locale } from '@/lib/translations'
-import { BookSummary } from '@/payload-types'
+import { BookSummary, Topic } from '@/payload-types'
 import { BookSummaryList } from './BookSummaryList'
 import { BottomNavigation } from './BottomNavigation'
 import { CardWithDrawerExample } from './CardWithDrawerExample'
@@ -16,14 +16,14 @@ type Props = {
   locale: Locale
   collections?: any[]
   bookRecommendations?: BookSummary[]
-  categories?: any[]
+  topics?: Topic[]
 }
 
 export function HomePageContent({
   locale,
   collections = [],
   bookRecommendations = [],
-  categories = [],
+  topics = [],
 }: Props) {
   const t = createTranslator(locale)
 
@@ -33,13 +33,7 @@ export function HomePageContent({
   // 将 CMS 数据转换为组件需要的格式
   const formattedBookRecommendations = bookRecommendations.slice(0, 6)
 
-  const formattedCategories = categories.slice(0, 8).map((category) => ({
-    id: category.id,
-    name: category.name,
-    icon: category.icon || '📖',
-    color: 'bg-blue-100',
-    slug: category.slug,
-  }))
+  const formattedtopics = topics.slice(0, 8)
 
   // 为微学习课程使用部分书籍数据
   const microlearningItems = bookRecommendations.slice(0, 4)
@@ -82,10 +76,10 @@ export function HomePageContent({
         )}
 
         {/* 你感兴趣的类别 */}
-        {formattedCategories.length > 0 && (
+        {formattedtopics.length > 0 && (
           <section>
             <h2 className="text-2xl font-bold mb-4">{t('home.categoriesInterested')}</h2>
-            <CategoryButtons items={formattedCategories} />
+            <CategoryButtons items={formattedtopics} />
           </section>
         )}
 

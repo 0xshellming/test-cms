@@ -1,16 +1,10 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-
-type CategoryItem = {
-  id: string
-  name: string
-  icon: string
-  color: string
-}
+import { Topic } from '@/payload-types'
 
 type Props = {
-  items: CategoryItem[]
+  items: Topic[]
 }
 
 export function CategoryButtons({ items }: Props) {
@@ -20,9 +14,12 @@ export function CategoryButtons({ items }: Props) {
         {items.map((item) => (
           <button
             key={item.id}
+            style={{
+              backgroundColor: item.backgroundColor,
+            }}  
             className={cn(
               'flex items-center gap-2 px-5 py-3 rounded-full border-2 border-gray-200 flex-shrink-0 hover:shadow-md hover:border-blue-300 transition-all active:scale-95',
-              item.color,
+              
             )}
           >
             <span className="text-2xl">{item.icon}</span>

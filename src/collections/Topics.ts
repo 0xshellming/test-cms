@@ -64,5 +64,22 @@ export const Topics: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'backgroundColor',
+      type: 'text',
+      label: 'Background Color',
+      admin: {
+        description: 'Hex code for background color (e.g., #F3E5F5)',
+      },
+    },
+    {
+      name: 'sort',
+      type: 'number',
+      label: 'Sort Order',
+      defaultValue: 0,
+      admin: {
+        description: 'Order for sorting topics (lower numbers first)',
+      },
+    },
   ],
 }

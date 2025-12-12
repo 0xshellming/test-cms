@@ -53,7 +53,7 @@ export default async function HomePage(props: Props) {
   })
 
   // 获取分类
-  const categories = await payload.find({
+  const topics = await payload.find({
     collection: 'topics',
     limit: 20,
     locale: locale,
@@ -65,7 +65,7 @@ export default async function HomePage(props: Props) {
         locale={locale}
         collections={collectionsResult.docs}
         bookRecommendations={bookRecommendations.docs}
-        categories={categories.docs}
+        topics={topics.docs}
       />
     </div>
   )
