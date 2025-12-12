@@ -148,9 +148,9 @@ export function BookSummaryDrawer({ children, bookSummary, locale }: BookSummary
                 <h3 id="about-author-heading" className="font-bold text-lg text-gray-900">
                   {t('bookSummary.aboutThisGem')}
                 </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <div className="text-sm text-gray-600 leading-relaxed">
                   <StaticMarkdown content={bookSummary.aboutAuthor} />
-                </p>
+                </div>
               </section>
             )}
 
@@ -163,9 +163,9 @@ export function BookSummaryDrawer({ children, bookSummary, locale }: BookSummary
                 <div>
                   {bookSummary.metadata?.ratingValue} {bookSummary.metadata?.ratingsCount}
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <div className="text-sm text-gray-600 leading-relaxed">
                   <StaticMarkdown content={bookSummary.review} />
-                </p>
+                </div>
               </section>
             )}
 

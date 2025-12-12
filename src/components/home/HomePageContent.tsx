@@ -79,7 +79,7 @@ export function HomePageContent({
         {formattedtopics.length > 0 && (
           <section>
             <h2 className="text-2xl font-bold mb-4">{t('home.categoriesInterested')}</h2>
-            <CategoryButtons items={formattedtopics} />
+            <CategoryButtons items={formattedtopics} locale={locale} />
           </section>
         )}
 
