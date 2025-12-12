@@ -13,6 +13,53 @@ export const BookSummaries: CollectionConfig = {
     update: () => true, // 添加这行
     delete: () => true, // 添加这行（可选）
   },
+  hooks: {
+    beforeChange: [
+      async ({ data, req, operation }) => {
+        // Only run on create or update
+        if (operation === 'create' || operation === 'update') {
+          // If topics are already manually set, we might want to respect that?
+          // For now, let's append/update based on tags if present.
+          
+          const tags = data.metadata?.tags?.map((t: { tag: string }) => t.tag) || []
+          
+          if (tags.length > 0) {
+            // Find topics that match these tags in their keywords
+            // Since we can't easily do a "where keywords.keyword IN tags" efficient query in all adapters without custom query logic or iterating,
+            // we'll try a flexible search. Or simpler: iterate all topics (cache them?) or search by keyword one by one?
+            // "where keywords.keyword in [list]" is supported by Payload? 
+            // Yes, usually `in` works on array fields if configured right, but deep match on array structure might be tricky.
+            // Let's try to query topics where 'keywords.keyword' is in our tags list.
+            
+            try {
+                const matchedTopics = await req.payload.find({
+                    collection: 'topics',
+                    where: {
+                        'keywords.keyword': {
+                            in: tags
+                        }
+                    },
+                    limit: 100,
+                });
+
+                if (matchedTopics.docs.length > 0) {
+                    const topicIds = matchedTopics.docs.map(t => t.id);
+                    // Merge with existing topics if any?
+                    // data.topics might be undefined or array of IDs
+                    const existingTopics = Array.isArray(data.topics) ? data.topics : [];
+                    // Ensure unique IDs
+                    const allTopics = Array.from(new Set([...existingTopics, ...topicIds]));
+                    data.topics = allTopics;
+                }
+            } catch (e) {
+                console.error("Error matching topics:", e);
+            }
+          }
+        }
+        return data
+      },
+    ],
+  },
   fields: [
     // 基本信息
     {
@@ -271,6 +318,16 @@ export const BookSummaries: CollectionConfig = {
           label: '关键词',
         },
       ],
+    },
+    {
+      name: 'topics',
+      type: 'relationship',
+      relationTo: 'topics',
+      hasMany: true,
+      label: 'Topics',
+      admin: {
+        position: 'sidebar',
+      },
     },
   ],
   versions: {

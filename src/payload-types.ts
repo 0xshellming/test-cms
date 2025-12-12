@@ -75,6 +75,7 @@ export interface Config {
     'book-summaries': BookSummary;
     'youtube-summaries': YoutubeSummary;
     collections: Collection;
+    topics: Topic;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +91,7 @@ export interface Config {
     'book-summaries': BookSummariesSelect<false> | BookSummariesSelect<true>;
     'youtube-summaries': YoutubeSummariesSelect<false> | YoutubeSummariesSelect<true>;
     collections: CollectionsSelect<false> | CollectionsSelect<true>;
+    topics: TopicsSelect<false> | TopicsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -346,9 +348,37 @@ export interface BookSummary {
     metaDescription?: string | null;
     keywords?: string | null;
   };
+  topics?: (number | Topic)[] | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics".
+ */
+export interface Topic {
+  id: number;
+  /**
+   * Unique English Identifier (e.g., career)
+   */
+  slug: string;
+  /**
+   * Display Name (Chinese)
+   */
+  name: string;
+  icon?: string | null;
+  /**
+   * Keywords to automatically map Books to this Topic
+   */
+  keywords?:
+    | {
+        keyword?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -668,6 +698,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'collections';
         value: number | Collection;
+      } | null)
+    | ({
+        relationTo: 'topics';
+        value: number | Topic;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -844,6 +878,7 @@ export interface BookSummariesSelect<T extends boolean = true> {
         metaDescription?: T;
         keywords?: T;
       };
+  topics?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -955,6 +990,23 @@ export interface CollectionsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics_select".
+ */
+export interface TopicsSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  icon?: T;
+  keywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

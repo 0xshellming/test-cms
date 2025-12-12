@@ -17,6 +17,7 @@ import { Tags } from './collections/Tags'
 import { BookSummaries } from './collections/BookSummaries'
 import { YouTubeSummaries } from './collections/YouTubeSummaries'
 import { Collections } from './collections/Collections'
+import { Topics } from './collections/Topics'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -45,6 +46,7 @@ export default buildConfig({
     BookSummaries,
     YouTubeSummaries,
     Collections,
+    Topics,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
