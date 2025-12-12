@@ -36,7 +36,7 @@ export function HomePageContent({
   const formattedCategories = categories.slice(0, 8).map((category) => ({
     id: category.id,
     name: category.name,
-    icon: '📖',
+    icon: category.icon || '📖',
     color: 'bg-blue-100',
     slug: category.slug,
   }))
